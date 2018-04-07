@@ -1,0 +1,14 @@
+language: php
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
+before_script:
+  - composer -n --prefer-source install
+
+script:
+  - bin/phpunit
+  - bin/phpstan analyse -l max -c phpstan.neon src/ tests/
+  - bin/phpcs
