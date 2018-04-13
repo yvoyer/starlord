@@ -116,6 +116,16 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     }
 
     /**
+     * Return the cards in hand
+     *
+     * @return int[] Card ids
+     */
+    public function cards(): array
+    {
+        return array_keys($this->hand);
+    }
+
+    /**
      * @param int $cardId
      *
      * @return bool
