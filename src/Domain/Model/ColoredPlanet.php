@@ -27,10 +27,10 @@ final class ColoredPlanet implements Planet
     }
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    public function play(int $playerId, WriteOnlyPlayer $player)
+    public function play(PlayerId $playerId, WriteOnlyPlayer $player)
     {
         throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
     }

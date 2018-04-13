@@ -30,6 +30,6 @@ final class PlayerSetup
         if ($this->players->playerExists($playerId)) {
             throw new \InvalidArgumentException("Player with id '{$playerId}' already exists.");
         }
-        $this->players->savePlayer($playerId, new TestPlayer($playerId));
+        $this->players->savePlayer($playerId, TestPlayer::fromInt($playerId));
     }
 }

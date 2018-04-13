@@ -21,8 +21,8 @@ final class StartingColonsTest extends TestCase
 
     public function test_it_should_give_players_their_base_colons()
     {
-        $this->players->savePlayer(1, $playerOne = new TestPlayer(1));
-        $this->players->savePlayer(2, $playerTwo = new TestPlayer(2));
+        $this->players->savePlayer(1, $playerOne = TestPlayer::fromInt(1));
+        $this->players->savePlayer(2, $playerTwo = TestPlayer::fromInt(2));
 
         $this->assertSame(0, $playerOne->getPopulation()->toInt());
         $this->assertSame(0, $playerTwo->getPopulation()->toInt());

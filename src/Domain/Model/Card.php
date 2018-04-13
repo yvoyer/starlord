@@ -5,10 +5,10 @@ namespace StarLord\Domain\Model;
 interface Card
 {
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    public function play(int $playerId, WriteOnlyPlayer $player);
+    public function play(PlayerId $playerId, WriteOnlyPlayer $player);
 
     /**
      * @param WriteOnlyPlayer $player

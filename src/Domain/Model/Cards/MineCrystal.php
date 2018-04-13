@@ -5,6 +5,7 @@ namespace StarLord\Domain\Model\Cards;
 use StarLord\Domain\Model\Bonus\Crystal;
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Credit;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 use Webmozart\Assert\Assert;
 
@@ -32,10 +33,10 @@ final class MineCrystal implements Card
     }
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    public function play(int $playerId, WriteOnlyPlayer $player)
+    public function play(PlayerId $playerId, WriteOnlyPlayer $player)
     {
         $player->pay(new Credit(5));
         $player->mineCrystal($this->crystal);

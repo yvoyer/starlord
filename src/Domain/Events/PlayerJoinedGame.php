@@ -2,25 +2,27 @@
 
 namespace StarLord\Domain\Events;
 
+use StarLord\Domain\Model\PlayerId;
+
 final class PlayerJoinedGame implements StarLordEvent
 {
     /**
-     * @var int
+     * @var PlayerId
      */
     private $playerId;
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      */
-    public function __construct(int $playerId)
+    public function __construct(PlayerId $playerId)
     {
         $this->playerId = $playerId;
     }
 
     /**
-     * @return int
+     * @return PlayerId
      */
-    public function playerId(): int
+    public function playerId(): PlayerId
     {
         return $this->playerId;
     }
@@ -32,7 +34,7 @@ final class PlayerJoinedGame implements StarLordEvent
     {
         return json_encode([
             'name' => 'player_joined_game',
-            'player' => $this->playerId,
+            'player' => $this->playerId->toString(),
         ]);
     }
 

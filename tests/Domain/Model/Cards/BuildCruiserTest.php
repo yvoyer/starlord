@@ -22,7 +22,7 @@ final class BuildCruiserTest extends TestCase
     public function test_it_should_cost_credit()
     {
         $cardId = 12;
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $player->addDeuterium(new Deuterium(10));
         $player->drawCard($cardId, $this->card);
@@ -37,7 +37,7 @@ final class BuildCruiserTest extends TestCase
     public function test_it_should_cost_deuterium()
     {
         $cardId = 12;
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $player->addDeuterium(new Deuterium(10));
         $player->drawCard($cardId, $this->card);
@@ -52,7 +52,7 @@ final class BuildCruiserTest extends TestCase
     public function test_it_should_add_ships_to_player()
     {
         $cardId = 12;
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $player->addDeuterium(new Deuterium(10));
         $player->drawCard($cardId, $this->card);

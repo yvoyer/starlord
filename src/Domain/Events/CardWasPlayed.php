@@ -2,6 +2,8 @@
 
 namespace StarLord\Domain\Events;
 
+use StarLord\Domain\Model\PlayerId;
+
 final class CardWasPlayed implements StarLordEvent
 {
     /**
@@ -10,15 +12,15 @@ final class CardWasPlayed implements StarLordEvent
     private $cardId;
 
     /**
-     * @var int
+     * @var PlayerId
      */
     private $playerId;
 
     /**
      * @param int $cardId
-     * @param int $playerId
+     * @param PlayerId $playerId
      */
-    public function __construct(int $cardId, int $playerId)
+    public function __construct(int $cardId, PlayerId $playerId)
     {
         $this->cardId = $cardId;
         $this->playerId = $playerId;
@@ -33,9 +35,9 @@ final class CardWasPlayed implements StarLordEvent
     }
 
     /**
-     * @return int
+     * @return PlayerId
      */
-    public function playerId(): int
+    public function playerId(): PlayerId
     {
         return $this->playerId;
     }
@@ -47,7 +49,7 @@ final class CardWasPlayed implements StarLordEvent
     {
         return json_encode([
             'name' => 'card_was_played',
-            'player_id' => $this->playerId(),
+            'player_id' => $this->playerId->toString(),
             'card_id' => $this->cardId(),
         ]);
     }

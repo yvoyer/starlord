@@ -10,7 +10,7 @@ final class BuildColonistsTest extends TestCase
 {
     public function test_it_should_cost_credit_to_play()
     {
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $player->drawCard(1, new BuildColonists(1));
 
@@ -23,7 +23,7 @@ final class BuildColonistsTest extends TestCase
 
     public function test_it_should_increase_population_of_player()
     {
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $player->drawCard(1, new BuildColonists(3));
 

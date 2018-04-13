@@ -23,9 +23,9 @@ final class CollectResourcesFromCrystals
     public function onTurnWasStarted(TurnWasStarted $event)
     {
         $players = $this->players->playersOfGame();
-        foreach ($players as $playerId => $player) {
+        foreach ($players as $player) {
             $player->collectResourcesFromCrystals();
-            $this->players->savePlayer($playerId, $player);
+            $this->players->savePlayer($player->getIdentity(), $player);
         }
     }
 }

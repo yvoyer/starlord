@@ -2,7 +2,9 @@
 
 namespace StarLord\Domain\Model;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Star\Component\State\InvalidStateTransitionException;
 use StarLord\Domain\Model\Bonus\BlueCrystal;
 use StarLord\Domain\Model\Bonus\GreenCrystal;
 use StarLord\Domain\Model\Bonus\YellowCrystal;
@@ -14,9 +16,21 @@ final class TestPlayerTest extends TestCase
      */
     private $player;
 
+    /**
+     * @var Card|MockObject
+     */
+    private $card;
+
+    /**
+     * @var UserAction|MockObject
+     */
+    private $action;
+
     public function setUp()
     {
-        $this->player = new TestPlayer(99);
+        $this->card = $this->createMock(Card::class);
+        $this->action = $this->createMock(UserAction::class);
+        $this->player = TestPlayer::fromInt(99);
     }
 
     public function test_it_should_have_a_number_of_crystal_at_home_world()
@@ -60,12 +74,12 @@ final class TestPlayerTest extends TestCase
 
     public function test_it_should_throw_exception_when_card_already_in_hand()
     {
-        $this->player->drawCard(34, $this->createMock(Card::class));
+        $this->player->drawCard(34, $this->card);
         $this->assertTrue($this->player->hasCardInHand(34));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Card with id "34" is already in hand of player "99".');
-        $this->player->drawCard(34, $this->createMock(Card::class));
+        $this->player->drawCard(34, $this->card);
     }
 
     public function test_it_should_add_transports()
@@ -106,7 +120,7 @@ final class TestPlayerTest extends TestCase
 
     public function test_playing_a_card_should_remove_it_from_the_hand()
     {
-        $this->player->drawCard(1, $this->createMock(Card::class));
+        $this->player->drawCard(1, $this->card);
         $this->assertFalse($this->player->hasCardInPlay($cardId = 1));
         $this->assertTrue($this->player->hasCardInHand($cardId));
 
@@ -204,5 +218,14 @@ final class TestPlayerTest extends TestCase
         $this->player->collectResourcesFromCrystals();
 
         $this->assertSame(3, $this->player->getDeuterium()->toInt());
+    }
+
+    public function test_it_should_put_the_player_in_stale_mode_on_colonize()
+    {
+        $this->assertFalse($this->player->isPlaying());
+
+        $this->player->startAction();
+
+        $this->assertTrue($this->player->isPlaying());
     }
 }

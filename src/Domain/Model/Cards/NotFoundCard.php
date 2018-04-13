@@ -3,6 +3,7 @@
 namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
 final class NotFoundCard implements Card
@@ -21,10 +22,10 @@ final class NotFoundCard implements Card
     }
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    public function play(int $playerId, WriteOnlyPlayer $player)
+    public function play(PlayerId $playerId, WriteOnlyPlayer $player)
     {
         throw new \LogicException(
             sprintf(

@@ -12,7 +12,7 @@ final class MineCrystalTest extends TestCase
 {
     public function test_it_should_add_crystal_of_color_on_planet_of_player_choice()
     {
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $card = new MineCrystal(1, RedCrystal::withSize('small'));
         $player->drawCard(1, $card);
@@ -26,7 +26,7 @@ final class MineCrystalTest extends TestCase
 
     public function test_it_should_cost_credit()
     {
-        $player = new TestPlayer(1);
+        $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
         $card = new MineCrystal(1, BlueCrystal::withSize('medium'));
         $player->drawCard(1, $card);

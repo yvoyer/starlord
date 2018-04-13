@@ -3,7 +3,9 @@
 namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
+use StarLord\Domain\Model\Credit;
 use StarLord\Domain\Model\Deck;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
 final class DeckBuilder
@@ -33,10 +35,10 @@ final class DeckBuilder
             }
 
             /**
-             * @param int $playerId
+             * @param PlayerId $playerId
              * @param WriteOnlyPlayer $player
              */
-            public function play(int $playerId, WriteOnlyPlayer $player)
+            public function play(PlayerId $playerId, WriteOnlyPlayer $player)
             {
                 throw new \RuntimeException("Card with id '{$this->cardId}' is not defined yet.");
             }
@@ -92,6 +94,14 @@ final class DeckBuilder
     public function buildColonists(int $cardId)
     {
         $this->addCard($cardId, new BuildColonists(1));
+    }
+
+    /**
+     * @param int $cardId
+     */
+    public function colonizePlanet(int $cardId)
+    {
+        $this->addCard($cardId, new ColonizePlanet(new Credit(2)));
     }
 
     /**

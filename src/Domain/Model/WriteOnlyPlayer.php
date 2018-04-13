@@ -7,6 +7,11 @@ use StarLord\Domain\Model\Bonus\Crystal;
 interface WriteOnlyPlayer
 {
     /**
+     * @return PlayerId
+     */
+    public function getIdentity(): PlayerId;
+
+    /**
      * @param Planet $planet
      * @deprecated todo remove
      */
@@ -28,6 +33,18 @@ interface WriteOnlyPlayer
      * @param int $cardId
      */
     public function playCard(int $cardId);
+
+    /**
+     * @param UserAction[] $requiredActions The required actions needed to finish the action.
+     */
+    public function startAction(array $requiredActions = []);
+
+    /**
+     * @param UserAction $action
+     */
+    public function performAction(UserAction $action);
+
+    public function endTurn();
 
     /**
      * @param int $number

@@ -5,24 +5,24 @@ namespace StarLord\Domain\Model;
 interface WriteOnlyPlayers
 {
     /**
-     * @param int $id
+     * @param PlayerId $id
      * @param WriteOnlyPlayer $player
      */
-    public function savePlayer(int $id, WriteOnlyPlayer $player);
+    public function savePlayer(PlayerId $id, WriteOnlyPlayer $player);
 
     /**
-     * @param int $id
+     * @param PlayerId $id
      *
      * @return WriteOnlyPlayer
      */
-    public function getPlayerWithId(int $id): WriteOnlyPlayer;
+    public function getPlayerWithId(PlayerId $id): WriteOnlyPlayer;
 
     /**
-     * @param int $id
+     * @param PlayerId $id
      *
      * @return bool
      */
-    public function playerExists(int $id): bool;
+    public function playerExists(PlayerId $id): bool;
 
     /**
      * todo inject game id

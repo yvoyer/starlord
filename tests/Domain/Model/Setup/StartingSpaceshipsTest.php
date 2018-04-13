@@ -27,7 +27,7 @@ final class StartingSpaceshipsTest extends TestCase
     public function setUp()
     {
         $this->players = new PlayerCollection();
-        $this->players->savePlayer(1, $this->player = new TestPlayer(1));
+        $this->players->savePlayer(1, $this->player = TestPlayer::fromInt(1));
         $this->handler = new StartingSpaceships($this->players, 1, 2, 3);
     }
 

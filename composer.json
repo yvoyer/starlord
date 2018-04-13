@@ -21,7 +21,9 @@
 		}
 	},
     "require": {
-        "php": "~7.0"
+        "php": "~7.0",
+        "star/state-machine": "^1.0@dev",
+        "star/identity": "^1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.5",

@@ -2,25 +2,27 @@
 
 namespace StarLord\Domain\Model\Commands;
 
+use StarLord\Domain\Model\PlayerId;
+
 final class DrawCard
 {
     /**
-     * @var int
+     * @var PlayerId
      */
     private $playerId;
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      */
-    public function __construct(int $playerId)
+    public function __construct(PlayerId $playerId)
     {
         $this->playerId = $playerId;
     }
 
     /**
-     * @return int
+     * @return PlayerId
      */
-    public function playerId(): int
+    public function playerId(): PlayerId
     {
         return $this->playerId;
     }

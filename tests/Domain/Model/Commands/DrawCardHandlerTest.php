@@ -8,6 +8,7 @@ use StarLord\Domain\Events\PlayerJoinedGame;
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Cards\AlwaysReturnCard;
 use StarLord\Domain\Model\Cards\NotFoundCard;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\TestPlayer;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 
@@ -35,7 +36,7 @@ final class DrawCardHandlerTest extends TestCase
 
     public function setUp()
     {
-        $this->player = new TestPlayer(1);
+        $this->player = TestPlayer::fromInt(1);
         $this->handler = new DrawCardHandler(
             $this->players = new PlayerCollection(),
             $this->deck = new AlwaysReturnCard(10, $this->createMock(Card::class)),
@@ -45,23 +46,23 @@ final class DrawCardHandlerTest extends TestCase
 
     public function test_it_should_draw_card_when_card_is_played()
     {
-        $this->players->savePlayer(1, $this->player);
+        $this->players->savePlayer(new PlayerId(1), $this->player);
         $this->assertCount(0, $this->player->cards());
 
-        $this->handler->onCardWasPlayed(new CardWasPlayed(10, 1));
+        $this->handler->onCardWasPlayed(new CardWasPlayed(10, new PlayerId(1)));
 
         $this->assertCount(1, $this->player->cards());
     }
 
     public function test_it_should_distribute_the_starting_cards_when_joining_the_game()
     {
-        $this->players->savePlayer(1, $this->player);
+        $this->players->savePlayer(new PlayerId(1), $this->player);
         $cardId = 10;
 
         $this->assertFalse($this->player->hasCardInHand($cardId));
         $this->assertAttributeCount(0, 'hand', $this->player);
 
-        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(1));
+        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(new PlayerId(1)));
 
         $this->assertTrue($this->player->hasCardInHand($cardId));
         $this->assertAttributeCount(1, 'hand', $this->player);
@@ -69,7 +70,7 @@ final class DrawCardHandlerTest extends TestCase
 
     public function test_it_should_throw_exception_when_card_not_in_deck()
     {
-        $playerId = 12;
+        $playerId = new PlayerId(12);
         $this->players->savePlayer($playerId, $this->player);
         $handler = new DrawCardHandler(
             $this->players,

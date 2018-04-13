@@ -2,6 +2,7 @@
 
 namespace StarLord\Domain\Model;
 
+use Star\Component\Identity\Exception\EntityNotFoundException;
 use Webmozart\Assert\Assert;
 
 final class Galaxy implements World
@@ -35,6 +36,17 @@ final class Galaxy implements World
         return array_filter($this->planets, function (Planet $planet) {
             return $planet->isColonized();
         });
+    }
+
+    /**
+     * @param PlanetId $id
+     *
+     * @return Planet
+     * @throws EntityNotFoundException
+     */
+    public function planetWithId(PlanetId $id): Planet
+    {
+        throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
     }
 
     /**

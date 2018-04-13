@@ -2,6 +2,7 @@
 
 namespace StarLord\Domain\Model;
 
+use Assert\Assertion;
 use StarLord\Domain\Model\Bonus\Crystal;
 use StarLord\Domain\Model\Cards\NotFoundCard;
 
@@ -57,7 +58,20 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
      */
     private $battlefield = [];
 
-    public function __construct(int $playerId)
+    /**
+     * @var Colons
+     */
+    private $colons;
+
+    /**
+     * @var PlayerState
+     */
+    private $state;
+
+    /**
+     * @param PlayerId $playerId
+     */
+    private function __construct(PlayerId $playerId)
     {
         $this->id = $playerId;
         $this->population = new Population();
@@ -67,6 +81,16 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         $this->armada = new Armada();
         $this->level = new MiningLevel();
         $this->baseAttack = new BaseAttack();
+        $this->state = new PlayerState();
+        $this->colons = new Colons(0);
+    }
+
+    /**
+     * @return PlayerId
+     */
+    public function getIdentity(): PlayerId
+    {
+        return $this->id;
     }
 
     /**
@@ -79,6 +103,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 
     public function collectResourcesFromCrystals()
     {
+        // todo put in another model
         foreach ($this->hoard->crystals() as $crystal) {
             $crystal->allocateResourceTo($this);
         }
@@ -116,6 +141,36 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     }
 
     /**
+     * @return bool
+     */
+    public function isPlaying(): bool
+    {
+        return $this->state->isPlaying();
+    }
+
+    public function hasPlayed(): bool
+    {
+        return $this->state->hasPlayed();
+    }
+
+    public function startAction(array $requiredActions = [])
+    {
+        Assertion::allIsInstanceOf($requiredActions, ActionName::class);
+        $this->state = $this->state->startAction();
+    }
+
+    public function performAction(UserAction $action)
+    {
+        $this->state = $this->state->performAction($action);
+        $action->perform($this);
+    }
+
+    public function endTurn()
+    {
+        $this->state = $this->state->endTurn();
+    }
+
+    /**
      * Return the cards in hand
      *
      * @return int[] Card ids
@@ -150,6 +205,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
      */
     public function addColons(int $bonus)
     {
+        $this->colons = $this->colons->addColons($bonus);
         $this->population = $this->population->addColons($bonus);
     }
 
@@ -291,6 +347,14 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     }
 
     /**
+     * @return Colons
+     */
+    public function availableColons(): Colons
+    {
+        return $this->colons;
+    }
+
+    /**
      * @param Deuterium $deuterium
      */
     private function removeDeuterium(Deuterium $deuterium)
@@ -312,5 +376,15 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         }
 
         return $card;
+    }
+
+    /**
+     * @param int $playerId
+     *
+     * @return TestPlayer
+     */
+    public static function fromInt(int $playerId): self
+    {
+        return new self(new PlayerId($playerId));
     }
 }

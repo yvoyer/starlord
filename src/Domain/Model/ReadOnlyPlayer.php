@@ -38,4 +38,19 @@ interface ReadOnlyPlayer
      * @return MiningLevel
      */
     public function getMiningLevel(): MiningLevel;
+
+    /**
+     * @return bool
+     */
+    public function isPlaying(): bool;
+
+    /**
+     * @return bool
+     */
+    public function hasPlayed(): bool;
+
+    /**
+     * @return Colons
+     */
+    public function availableColons(): Colons;
 }

@@ -2,10 +2,15 @@
 
 namespace StarLord\Infrastructure\Persistence\InMemory;
 
+use Star\Component\Identity\Exception\EntityNotFoundException;
+use StarLord\Domain\Model\Colons;
+use StarLord\Domain\Model\PlayerId;
+use StarLord\Domain\Model\ReadOnlyPlayer;
+use StarLord\Domain\Model\ReadOnlyPlayers;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 use StarLord\Domain\Model\WriteOnlyPlayers;
 
-final class PlayerCollection implements WriteOnlyPlayers, \Countable
+final class PlayerCollection implements WriteOnlyPlayers, ReadOnlyPlayers, \Countable
 {
     /**
      * @var WriteOnlyPlayer[]
@@ -18,44 +23,44 @@ final class PlayerCollection implements WriteOnlyPlayers, \Countable
     public function __construct(array $players = [])
     {
         array_map(
-            function (int $id) use ($players) {
-                $this->savePlayer($id, $players[$id]);
+            function (WriteOnlyPlayer $player) {
+                $this->savePlayer($player->getIdentity(), $player);
             },
-            array_keys($players)
+            $players
         );
     }
 
     /**
-     * @param int $id
+     * @param PlayerId $id
      * @param WriteOnlyPlayer $player
      */
-    public function savePlayer(int $id, WriteOnlyPlayer $player)
+    public function savePlayer(PlayerId $id, WriteOnlyPlayer $player)
     {
-        $this->players[$id] = $player;
+        $this->players[$id->toString()] = $player;
     }
 
     /**
-     * @param int $id
+     * @param PlayerId $id
      *
      * @return WriteOnlyPlayer
      */
-    public function getPlayerWithId(int $id): WriteOnlyPlayer
+    public function getPlayerWithId(PlayerId $id): WriteOnlyPlayer
     {
         if (! $this->playerExists($id)) {
             throw new \RuntimeException("Player with id '{$id}' do not exists.");
         }
 
-        return $this->players[$id];
+        return $this->players[$id->toString()];
     }
 
     /**
-     * @param int $id
+     * @param PlayerId $id
      *
      * @return bool
      */
-    public function playerExists(int $id): bool
+    public function playerExists(PlayerId $id): bool
     {
-        return array_key_exists($id, $this->players);
+        return array_key_exists($id->toString(), $this->players);
     }
 
     /**
@@ -67,11 +72,42 @@ final class PlayerCollection implements WriteOnlyPlayers, \Countable
     }
 
     /**
-     * todo inject game id
      * @return WriteOnlyPlayer[]
      */
     public function playersOfGame(): array
     {
-        return $this->players;
+        return array_values($this->players);
+    }
+
+    /**
+     * @return bool
+     */
+    public function allPlayersOfGameHavePlayed(): bool
+    {
+        return count(array_filter(
+            $this->players,
+            function (ReadOnlyPlayer $player) {
+                return ! $player->hasPlayed();
+            }
+        )) === 0;
+    }
+
+    /**
+     * @param PlayerId $id
+     *
+     * @return Colons
+     * @throws EntityNotFoundException
+     */
+    public function availableColons(PlayerId $id): Colons
+    {
+//        if (! isset($this->players[$id->toString()])) {
+            throw EntityNotFoundException::objectWithAttribute(
+                ReadOnlyPlayer::class,
+                'identity',
+                $id->toString()
+            );
+  //      }
+
+    //    return $this->players[$id->toString()];
     }
 }

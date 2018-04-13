@@ -2,6 +2,8 @@
 
 namespace StarLord\Domain\Model;
 
+use Star\Component\Identity\Exception\EntityNotFoundException;
+
 interface World
 {
     /**
@@ -15,4 +17,12 @@ interface World
      * @return Planet[]
      */
     public function allPlanets(): array;
+
+    /**
+     * @param PlanetId $id
+     *
+     * @return Planet
+     * @throws EntityNotFoundException
+     */
+    public function planetWithId(PlanetId $id): Planet;
 }
