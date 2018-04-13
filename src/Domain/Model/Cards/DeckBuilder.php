@@ -4,6 +4,7 @@ namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Deck;
+use StarLord\Domain\Model\WriteOnlyPlayer;
 
 final class DeckBuilder
 {
@@ -11,6 +12,43 @@ final class DeckBuilder
      * @var Card[]
      */
     private $cards = [];
+
+    /**
+     * @param int $cardId
+     */
+    public function addPendingCard(int $cardId)
+    {
+        $this->addCard($cardId, new class($cardId) implements Card {
+            /**
+             * @var int
+             */
+            private $cardId;
+
+            /**
+             * @param int $cardId
+             */
+            public function __construct(int $cardId)
+            {
+                $this->cardId = $cardId;
+            }
+
+            /**
+             * @param int $playerId
+             * @param WriteOnlyPlayer $player
+             */
+            public function play(int $playerId, WriteOnlyPlayer $player)
+            {
+                throw new \RuntimeException("Card with id '{$this->cardId}' is not defined yet.");
+            }
+
+            /**
+             * @param WriteOnlyPlayer $player
+             */
+            public function draw(WriteOnlyPlayer $player)
+            {
+            }
+        });
+    }
 
     /**
      * @param int $cardId

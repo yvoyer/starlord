@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace StarLord\Domain\Model\Setup;
+namespace StarLord\Domain\Model\Commands;
 
+use StarLord\Domain\Events\CardWasPlayed;
 use StarLord\Domain\Events\PlayerJoinedGame;
 use StarLord\Domain\Model\Deck;
 use StarLord\Domain\Model\WriteOnlyPlayers;
 
-final class StartingCardsInHand
+final class DrawCardHandler
 {
     /**
      * @var WriteOnlyPlayers
@@ -36,17 +37,33 @@ final class StartingCardsInHand
     }
 
     /**
+     * @param CardWasPlayed $event
+     */
+    public function onCardWasPlayed(CardWasPlayed $event)
+    {
+        $this->__invoke(new DrawCard($event->playerId()));
+    }
+
+    /**
      * @param PlayerJoinedGame $event
      */
     public function onPlayerJoinedGame(PlayerJoinedGame $event)
     {
-        $player = $this->players->getPlayerWithId($event->playerId());
-
         for ($i = 0; $i < $this->countAtStart; $i ++) {
-            $card = $this->deck->drawCard($cardId = $this->deck->revealTopCard());
-            $player->drawCard($cardId, $card);
+            $this->__invoke(new DrawCard($event->playerId()));
         }
+    }
 
-        $this->players->savePlayer($event->playerId(), $player);
+    /**
+     * @param DrawCard $command
+     */
+    public function __invoke(DrawCard $command)
+    {
+        $player = $this->players->getPlayerWithId($command->playerId());
+        $cardId = $this->deck->revealTopCard();
+        $card = $this->deck->drawCard($cardId);
+        $player->drawCard($cardId, $card);
+
+        $this->players->savePlayer($command->playerId(), $player);
     }
 }
