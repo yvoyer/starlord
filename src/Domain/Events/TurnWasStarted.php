@@ -9,7 +9,7 @@ final class TurnWasStarted implements StarLordEvent
      */
     public function serialize()
     {
-        return serialize(['name' => 'turn_was_started']);
+        return json_encode(['name' => 'turn_was_started']);
     }
 
     /**

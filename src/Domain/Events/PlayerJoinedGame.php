@@ -30,7 +30,7 @@ final class PlayerJoinedGame implements StarLordEvent
      */
     public function serialize()
     {
-        return serialize([
+        return json_encode([
             'name' => 'player_joined_game',
             'player' => $this->playerId,
         ]);

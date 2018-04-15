@@ -12,7 +12,7 @@ final class GameHasEnded implements StarLordEvent
      */
     public function serialize()
     {
-        return serialize(
+        return json_encode(
             [
                 'name' => 'turn_ended',
             ]
