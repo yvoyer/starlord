@@ -9,7 +9,7 @@ final class GameWasStarted implements StarLordEvent
      */
     public function serialize()
     {
-        return serialize(['name' => 'game_was_started']);
+        return json_encode(['name' => 'game_was_started']);
     }
 
     /**
