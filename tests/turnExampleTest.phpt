@@ -8,6 +8,7 @@ use StarLord\Domain\Model\Commands\LoadColons;
 use StarLord\Domain\Model\Commands\MoveShip;
 use StarLord\Domain\Model\Commands\PlayCard;
 use StarLord\Domain\Model\Commands\StartGame;
+use StarLord\Domain\Model\Commands\UnloadColons;
 use StarLord\Domain\Model\GameSettings;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -125,7 +126,7 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
     );
 //    $performActionHandler = new \StarLord\Domain\Model\Commands\PerformActionHandlerTest($players, $actions, $publisher);
     $moveShipHandler = new \StarLord\Domain\Model\Commands\MoveShipHandler($players, $armadas, $world);
-    $loadColonsHandler = new \StarLord\Domain\Model\Commands\LoadColonsHandler();
+    $loadColonsHandler = new \StarLord\Domain\Model\Commands\LoadColonsHandler($players, $armadas, $publisher);
     $unloadColonsHandler = new \StarLord\Domain\Model\Commands\UnloadColonsHandler();
     $endPlayerTurnHandler = new \StarLord\Domain\Model\Commands\EndPlayerTurnHandler($players, $publisher);
 }
@@ -211,7 +212,7 @@ function dumpPlayer(int $id, \StarLord\Domain\Model\WriteOnlyPlayers $players) {
     $playCardHandler(new PlayCard($playerOne, 1012)); // Colonize planet
     $loadColonsHandler(new LoadColons($playerOne, 2, $t1_playerOne));
     $moveShipHandler(new MoveShip($playerOne, $t1_playerOne, $planet1));
-    $unloadColonsHandler(new UnloadColonsHandler($playerOne, 2, $planet2));
+    $unloadColonsHandler(new UnloadColons($playerOne, 2, $planet2));
     $endPlayerTurnHandler(new EndPlayerTurn($playerOne));
 
 //    $performActionHandler(new PerformAction($playerOne, $a_moveShip->name()));
