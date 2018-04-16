@@ -58,4 +58,16 @@ final class MoveShip
     {
         return $this->destination;
     }
+
+    /**
+     * @param int $playerId
+     * @param int $shipId
+     * @param int $planetId
+     *
+     * @return MoveShip
+     */
+    public static function fromInt(int $playerId, int $shipId, int $planetId): self
+    {
+        return new self(new PlayerId($playerId), new ShipId($shipId), new PlanetId($planetId));
+    }
 }

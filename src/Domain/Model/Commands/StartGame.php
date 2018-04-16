@@ -2,26 +2,27 @@
 
 namespace StarLord\Domain\Model\Commands;
 
+use StarLord\Domain\Model\PlayerId;
 use Webmozart\Assert\Assert;
 
 final class StartGame
 {
     /**
-     * @var int[]
+     * @var PlayerId[]
      */
     private $players;
 
     /**
-     * @param int[] $players
+     * @param PlayerId[] $players
      */
     public function __construct(array $players)
     {
-        Assert::allInteger($players);
+        Assert::allIsInstanceOf($players, PlayerId::class);
         $this->players = $players;
     }
 
     /**
-     * @return int[]
+     * @return PlayerId[]
      */
     public function players(): array
     {

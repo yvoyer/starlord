@@ -2,16 +2,17 @@
 
 namespace StarLord\Domain\Model\Commands;
 
+use StarLord\Domain\Events\ColonsWereLoaded;
 use StarLord\Domain\Model\Colons;
 use StarLord\Domain\Model\Exception\MissingColonsException;
 use StarLord\Domain\Model\PlayerArmada;
 use StarLord\Domain\Model\Publisher;
-use StarLord\Domain\Model\ReadOnlyPlayers;
+use StarLord\Domain\Model\WriteOnlyPlayers;
 
 final class LoadColonsHandler
 {
     /**
-     * @var ReadOnlyPlayers
+     * @var WriteOnlyPlayers
      */
     private $players;
 
@@ -26,12 +27,12 @@ final class LoadColonsHandler
     private $publisher;
 
     /**
-     * @param ReadOnlyPlayers $players
+     * @param WriteOnlyPlayers $players
      * @param PlayerArmada $armada
      * @param Publisher $publisher
      */
     public function __construct(
-        ReadOnlyPlayers $players,
+        WriteOnlyPlayers $players,
         PlayerArmada $armada,
         Publisher $publisher
     ) {
@@ -45,12 +46,12 @@ final class LoadColonsHandler
      */
     public function __invoke(LoadColons $command)
     {
-//        $player = $this->players->playerWithId($command->playerId());
-        $availableColons = $this->players->availableColons($command->playerId());
+        $player = $this->players->getPlayerWithId($command->playerId());
+        $availableColons = $player->availableColons();
         if ($availableColons->lowerThan($command->quantity())) {
             throw new MissingColonsException(
                 sprintf(
-                    'Player with id "%s" do not have all required colons. Requires at least "%s", got "%s".',
+                    'Player with id "%s" do not have the required colons. Requires at least "%s", got "%s".',
                     $command->playerId()->toString(),
                     $command->quantity(),
                     $availableColons->toInt()
@@ -58,10 +59,20 @@ final class LoadColonsHandler
             );
         }
 
-        // todo reomve coloon from player
         $ship = $this->armada->shipWithId($command->shipId(), $command->playerId());
-        $ship->loadColons(new Colons($command->quantity()));
 
+        $quantity = new Colons($command->quantity());
+        $player->loadColons($quantity);
+        $ship->loadColons($quantity);
+
+        $this->players->savePlayer($command->playerId(), $player);
         $this->armada->saveShip($ship);
+        $this->publisher->publish(
+            new ColonsWereLoaded(
+                $command->playerId(),
+                $quantity,
+                $command->shipId()
+            )
+        );
     }
 }

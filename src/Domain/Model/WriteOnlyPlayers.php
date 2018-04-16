@@ -2,7 +2,7 @@
 
 namespace StarLord\Domain\Model;
 
-interface WriteOnlyPlayers
+interface WriteOnlyPlayers extends ReadOnlyPlayers
 {
     /**
      * @param PlayerId $id

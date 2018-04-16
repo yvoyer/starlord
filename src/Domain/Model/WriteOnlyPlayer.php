@@ -4,7 +4,7 @@ namespace StarLord\Domain\Model;
 
 use StarLord\Domain\Model\Bonus\Crystal;
 
-interface WriteOnlyPlayer
+interface WriteOnlyPlayer extends ReadOnlyPlayer
 {
     /**
      * @return PlayerId
@@ -43,6 +43,11 @@ interface WriteOnlyPlayer
      * @param UserAction $action
      */
     public function performAction(UserAction $action);
+
+    /**
+     * @param Colons $colons
+     */
+    public function loadColons(Colons $colons);
 
     public function endTurn();
 

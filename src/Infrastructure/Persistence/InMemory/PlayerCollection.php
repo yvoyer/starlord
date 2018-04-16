@@ -2,15 +2,12 @@
 
 namespace StarLord\Infrastructure\Persistence\InMemory;
 
-use Star\Component\Identity\Exception\EntityNotFoundException;
-use StarLord\Domain\Model\Colons;
 use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\ReadOnlyPlayer;
-use StarLord\Domain\Model\ReadOnlyPlayers;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 use StarLord\Domain\Model\WriteOnlyPlayers;
 
-final class PlayerCollection implements WriteOnlyPlayers, ReadOnlyPlayers, \Countable
+final class PlayerCollection implements WriteOnlyPlayers, \Countable
 {
     /**
      * @var WriteOnlyPlayer[]
@@ -90,24 +87,5 @@ final class PlayerCollection implements WriteOnlyPlayers, ReadOnlyPlayers, \Coun
                 return ! $player->hasPlayed();
             }
         )) === 0;
-    }
-
-    /**
-     * @param PlayerId $id
-     *
-     * @return Colons
-     * @throws EntityNotFoundException
-     */
-    public function availableColons(PlayerId $id): Colons
-    {
-//        if (! isset($this->players[$id->toString()])) {
-            throw EntityNotFoundException::objectWithAttribute(
-                ReadOnlyPlayer::class,
-                'identity',
-                $id->toString()
-            );
-  //      }
-
-    //    return $this->players[$id->toString()];
     }
 }

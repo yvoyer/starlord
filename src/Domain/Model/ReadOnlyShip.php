@@ -10,4 +10,9 @@ interface ReadOnlyShip
      * @return bool
      */
     public function isDocked(PlanetId $planetId): bool;
+
+    /**
+     * @return PlanetId
+     */
+    public function locationId(): PlanetId;
 }

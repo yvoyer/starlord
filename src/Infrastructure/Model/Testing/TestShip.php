@@ -3,12 +3,12 @@
 namespace StarLord\Infrastructure\Model\Testing;
 
 use StarLord\Domain\Model\Colons;
+use StarLord\Domain\Model\Exception\CapacityException;
 use StarLord\Domain\Model\PlanetId;
-use StarLord\Domain\Model\ReadOnlyShip;
 use StarLord\Domain\Model\ShipId;
 use StarLord\Domain\Model\WriteOnlyShip;
 
-final class TestShip implements WriteOnlyShip, ReadOnlyShip
+final class TestShip implements WriteOnlyShip
 {
     /**
      * @var ShipId
@@ -28,17 +28,19 @@ final class TestShip implements WriteOnlyShip, ReadOnlyShip
     /**
      * @var int
      */
-    private $capacity = 0;
+    private $capacity;
 
     /**
      * @param ShipId $shipId
      * @param PlanetId $location
+     * @param int $capacity
      */
-    private function __construct(ShipId $shipId, PlanetId $location)
+    public function __construct(ShipId $shipId, PlanetId $location, int $capacity)
     {
         $this->shipId = $shipId;
         $this->location = $location;
         $this->colons = new Colons(0);
+        $this->capacity = $capacity;
     }
 
     /**
@@ -62,7 +64,26 @@ final class TestShip implements WriteOnlyShip, ReadOnlyShip
      */
     public function loadColons(Colons $colons)
     {
+        if ($this->colons->addColons($colons->toInt())->greaterEqual($this->capacity)) {
+            throw new CapacityException(
+                sprintf(
+                    'Ship do not allow to exceed of "%s", tried to load %s colons with actual capacity "%s".',
+                    $this->capacity,
+                    $colons->toInt(),
+                    $this->colons->toInt() . '/' . $this->capacity
+                )
+            );
+        }
+
         $this->colons = $this->colons->addColons($colons->toInt());
+    }
+
+    /**
+     * @return PlanetId
+     */
+    public function locationId(): PlanetId
+    {
+        return $this->location;
     }
 
     /**
@@ -76,11 +97,15 @@ final class TestShip implements WriteOnlyShip, ReadOnlyShip
     }
 
     /**
-     * @return int
+     * @return Colons
      */
-    public function maximumCapacity(): int
+    public function remainingCapacity(): Colons
     {
-        return $this->capacity;
+        $remaining = 0;
+        if ($this->capacity >= $this->colons->toInt()) {
+            $remaining = $this->capacity - $this->colons->toInt();
+        }
+        return new Colons($remaining);
     }
 
     /**
@@ -94,12 +119,13 @@ final class TestShip implements WriteOnlyShip, ReadOnlyShip
     /**
      * @param int $shipId
      * @param int $planetId
+     * @param int $capacity
      *
      * @return TestShip
      */
-    public static function fromInt(int $shipId, int $planetId): self
+    public static function fromInt(int $shipId, int $planetId, int $capacity = 0): self
     {
-        return new self(new ShipId($shipId), new PlanetId($planetId));
+        return new self(new ShipId($shipId), new PlanetId($planetId), $capacity);
     }
 
     /**
@@ -110,9 +136,32 @@ final class TestShip implements WriteOnlyShip, ReadOnlyShip
      */
     public static function transport(int $shipId, int $planetId): self
     {
-        $ship = self::fromInt($shipId, $planetId);
-        $ship->capacity = 3;
+        $ship = self::fromInt($shipId, $planetId, 3);
 
         return $ship;
+    }
+
+    /**
+     * @param int $shipId
+     * @param int $planetId
+     *
+     * @return TestShip
+     */
+    public static function cruiser(int $shipId, int $planetId): self
+    {
+        $ship = self::fromInt($shipId, $planetId, 1);
+
+        return $ship;
+    }
+
+    /**
+     * @param int $shipId
+     * @param int $planetId
+     *
+     * @return TestShip
+     */
+    public static function fighter(int $shipId, int $planetId): self
+    {
+        return self::fromInt($shipId, $planetId);
     }
 }

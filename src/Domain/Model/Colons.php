@@ -33,11 +33,51 @@ final class Colons
     /**
      * @param int $quantity
      *
+     * @return bool
+     */
+    public function lowerEqualThan(int $quantity): bool
+    {
+        return $this->quantity <= $quantity;
+    }
+
+    /**
+     * @param int $quantity
+     *
+     * @return bool
+     */
+    public function greaterEqual(int $quantity): bool
+    {
+        return $this->quantity > $quantity;
+    }
+
+    /**
+     * @param int $quantity
+     *
+     * @return bool
+     */
+    public function greaterEqualThan(int $quantity): bool
+    {
+        return $this->quantity >= $quantity;
+    }
+
+    /**
+     * @param int $quantity
+     *
      * @return Colons
      */
     public function addColons(int $quantity): Colons
     {
         return new self($this->quantity + $quantity);
+    }
+
+    /**
+     * @param int $quantity
+     *
+     * @return Colons
+     */
+    public function removeColons(int $quantity): Colons
+    {
+        return new self($this->quantity - $quantity);
     }
 
     /**

@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\GameWasStarted;
 use StarLord\Domain\Events\PlayerJoinedGame;
 use StarLord\Domain\Model\Commands\StartGame;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\Publisher;
 
 final class GameSetupTest extends TestCase
@@ -47,6 +48,6 @@ final class GameSetupTest extends TestCase
             ->with($this->isInstanceOf(PlayerJoinedGame::class));
 
         $handler = $this->phase;
-        $handler(new StartGame([1]));
+        $handler(new StartGame([new PlayerId(1)]));
     }
 }

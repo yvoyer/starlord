@@ -120,7 +120,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
                 sprintf(
                     'Card with id "%s" is already in hand of player "%s".',
                     $cardId,
-                    $this->id
+                    $this->id->toString()
                 )
             );
         }
@@ -157,6 +157,14 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     {
         Assertion::allIsInstanceOf($requiredActions, ActionName::class);
         $this->state = $this->state->startAction();
+    }
+
+    /**
+     * @param Colons $colons
+     */
+    public function loadColons(Colons $colons)
+    {
+        $this->colons = $this->colons->removeColons($colons->toInt());
     }
 
     public function performAction(UserAction $action)

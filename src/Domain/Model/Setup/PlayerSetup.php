@@ -28,8 +28,8 @@ final class PlayerSetup
     {
         $playerId = $event->playerId();
         if ($this->players->playerExists($playerId)) {
-            throw new \InvalidArgumentException("Player with id '{$playerId}' already exists.");
+            throw new \InvalidArgumentException("Player with id '{$playerId->toString()}' already exists.");
         }
-        $this->players->savePlayer($playerId, TestPlayer::fromInt($playerId));
+        $this->players->savePlayer($playerId, TestPlayer::fromInt($playerId->toInt()));
     }
 }

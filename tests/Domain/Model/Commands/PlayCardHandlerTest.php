@@ -5,6 +5,7 @@ namespace StarLord\Domain\Model\Commands;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\CardWasPlayed;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
@@ -29,7 +30,7 @@ final class PlayCardHandlerTest extends TestCase
 
     public function test_it_should_increase_the_quantity_of_ship_in_play()
     {
-        $playerId = 12;
+        $playerId = new PlayerId(12);
         $player = $this->createMock(WriteOnlyPlayer::class);
         $player
             ->expects($this->once())
@@ -47,8 +48,8 @@ final class PlayCardHandlerTest extends TestCase
             ->method('publish')
             ->with($this->isInstanceOf(CardWasPlayed::class));
 
-        $this->players->savePlayer(1, $this->createMock(WriteOnlyPlayer::class));
+        $this->players->savePlayer($playerId = new PlayerId(1), $this->createMock(WriteOnlyPlayer::class));
         $handler = new PlayCardHandler($this->players, $this->publisher);
-        $handler(new PlayCard(1, 34));
+        $handler(new PlayCard($playerId, 34));
     }
 }

@@ -12,7 +12,10 @@ final class Galaxy implements World
      */
     private $planets;
 
-    private function __construct(array $planets)
+    /**
+     * @param Planet[] $planets
+     */
+    public function __construct(array $planets)
     {
         Assert::allIsInstanceOf($planets, Planet::class);
         $this->planets = $planets;

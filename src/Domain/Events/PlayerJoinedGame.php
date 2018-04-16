@@ -45,4 +45,14 @@ final class PlayerJoinedGame implements StarLordEvent
     {
         throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
     }
+
+    /**
+     * @param int $playerId
+     *
+     * @return PlayerJoinedGame
+     */
+    public static function fromInt(int $playerId): self
+    {
+        return new self(new PlayerId($playerId));
+    }
 }

@@ -31,7 +31,7 @@ final class NotFoundCard implements Card
             sprintf(
                 'Card with id "%s" is not in hand of player "%s".',
                 $this->cardId,
-                $playerId
+                $playerId->toString()
             )
         );
     }

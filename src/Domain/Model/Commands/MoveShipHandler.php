@@ -2,8 +2,9 @@
 
 namespace StarLord\Domain\Model\Commands;
 
-use StarLord\Domain\Model\Actions\MoveShipAction;
+use StarLord\Domain\Events\ShipWasMoved;
 use StarLord\Domain\Model\PlayerArmada;
+use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\World;
 use StarLord\Domain\Model\WriteOnlyPlayers;
 
@@ -25,18 +26,26 @@ final class MoveShipHandler
     private $world;
 
     /**
+     * @var Publisher
+     */
+    private $publish;
+
+    /**
      * @param WriteOnlyPlayers $players
      * @param PlayerArmada $armada
      * @param World $world
+     * @param Publisher $publish
      */
     public function __construct(
         WriteOnlyPlayers $players,
         PlayerArmada $armada,
-        World $world
+        World $world,
+        Publisher $publish
     ) {
         $this->players = $players;
         $this->armada = $armada;
         $this->world = $world;
+        $this->publish = $publish;
     }
 
     /**
@@ -44,16 +53,24 @@ final class MoveShipHandler
      */
     public function __invoke(MoveShip $command)
     {
-        $playerId = $command->playerId()->toInt();
+        $playerId = $command->playerId();
+        $shipId = $command->shipId();
+        $destinationId = $command->destination();
         $player = $this->players->getPlayerWithId($playerId);
-        $player->performAction(
-            new MoveShipAction(
-                $this->armada->shipWithId($command->shipId(), $command->playerId()),
-                $command->destination()
-            )
-        );
+        $ship = $this->armada->shipWithId($shipId, $playerId);
+
+        $ship->moveTo($destinationId);
 
         $this->players->savePlayer($playerId, $player);
+        $this->armada->saveShip($ship);
 
+        $this->publish->publish(
+            new ShipWasMoved(
+                $playerId,
+                $shipId,
+                $ship->locationId(),
+                $destinationId
+            )
+        );
     }
 }

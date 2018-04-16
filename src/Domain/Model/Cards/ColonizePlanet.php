@@ -31,6 +31,9 @@ final class ColonizePlanet implements Card
     {
         // pay credit
         $player->pay($this->cost);
+        // player may be RuleContext
+        // on start of context, a rule can be built
+        // todo on start ation, create a ruleset that will be validated on perform
         $player->startAction([UserActionStore::moveShip()]);
     }
 

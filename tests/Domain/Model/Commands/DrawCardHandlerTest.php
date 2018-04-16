@@ -62,7 +62,7 @@ final class DrawCardHandlerTest extends TestCase
         $this->assertFalse($this->player->hasCardInHand($cardId));
         $this->assertAttributeCount(0, 'hand', $this->player);
 
-        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(new PlayerId(1)));
+        $this->handler->onPlayerJoinedGame(PlayerJoinedGame::fromInt(1));
 
         $this->assertTrue($this->player->hasCardInHand($cardId));
         $this->assertAttributeCount(1, 'hand', $this->player);

@@ -2,10 +2,12 @@
 
 namespace StarLord\Domain\Model\Commands;
 
+use StarLord\Domain\Model\PlayerId;
+
 final class PlayCard
 {
     /**
-     * @var int
+     * @var PlayerId
      */
     private $playerId;
 
@@ -15,19 +17,19 @@ final class PlayCard
     private $cardId;
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      * @param int $cardId
      */
-    public function __construct(int $playerId, int $cardId)
+    public function __construct(PlayerId $playerId, int $cardId)
     {
         $this->playerId = $playerId;
         $this->cardId = $cardId;
     }
 
     /**
-     * @return int
+     * @return PlayerId
      */
-    public function playerId(): int
+    public function playerId(): PlayerId
     {
         return $this->playerId;
     }

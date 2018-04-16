@@ -3,6 +3,7 @@
 namespace StarLord\Domain\Model\Bonus;
 
 use StarLord\Domain\Events\TurnWasStarted;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\World;
 use StarLord\Domain\Model\WriteOnlyPlayers;
 
@@ -37,7 +38,7 @@ final class CollectResourcesFromPlanets
                 $player->collectResourcesFromPlanet($planet);
             }
 
-            $this->players->savePlayer($playerId, $player);
+            $this->players->savePlayer(new PlayerId($playerId), $player);
         }
     }
 }

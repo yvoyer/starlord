@@ -4,6 +4,7 @@ namespace StarLord\Domain\Model\Setup;
 
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\PlayerJoinedGame;
+use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\TestPlayer;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 
@@ -27,7 +28,7 @@ final class StartingSpaceshipsTest extends TestCase
     public function setUp()
     {
         $this->players = new PlayerCollection();
-        $this->players->savePlayer(1, $this->player = TestPlayer::fromInt(1));
+        $this->players->savePlayer(new PlayerId(1), $this->player = TestPlayer::fromInt(1));
         $this->handler = new StartingSpaceships($this->players, 1, 2, 3);
     }
 
@@ -35,7 +36,7 @@ final class StartingSpaceshipsTest extends TestCase
     {
         $this->assertSame(0, $this->player->getArmada()->transports());
 
-        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(1));
+        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(new PlayerId(1)));
 
         $this->assertSame(1, $this->player->getArmada()->transports());
     }
@@ -44,7 +45,7 @@ final class StartingSpaceshipsTest extends TestCase
     {
         $this->assertSame(0, $this->player->getArmada()->fighters());
 
-        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(1));
+        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(new PlayerId(1)));
 
         $this->assertSame(2, $this->player->getArmada()->fighters());
     }
@@ -53,7 +54,7 @@ final class StartingSpaceshipsTest extends TestCase
     {
         $this->assertSame(0, $this->player->getArmada()->cruisers());
 
-        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(1));
+        $this->handler->onPlayerJoinedGame(new PlayerJoinedGame(new PlayerId(1)));
 
         $this->assertSame(3, $this->player->getArmada()->cruisers());
     }

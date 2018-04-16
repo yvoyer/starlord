@@ -2,7 +2,7 @@
 
 namespace StarLord\Domain\Model;
 
-interface WriteOnlyShip
+interface WriteOnlyShip extends ReadOnlyShip
 {
     /**
      * @return ShipId
