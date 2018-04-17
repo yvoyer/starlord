@@ -8,7 +8,7 @@ use StarLord\Domain\Events\ColonsWereLoaded;
 use StarLord\Domain\Model\Exception\CapacityException;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\TestPlayer;
-use StarLord\Infrastructure\Model\Testing\TestShip;
+use StarLord\Domain\Model\TestShip;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 use StarLord\Infrastructure\Persistence\InMemory\ShipCollection;
 

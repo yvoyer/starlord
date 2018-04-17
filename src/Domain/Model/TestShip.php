@@ -1,12 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace StarLord\Infrastructure\Model\Testing;
+namespace StarLord\Domain\Model;
 
-use StarLord\Domain\Model\Colons;
 use StarLord\Domain\Model\Exception\CapacityException;
-use StarLord\Domain\Model\PlanetId;
-use StarLord\Domain\Model\ShipId;
-use StarLord\Domain\Model\WriteOnlyShip;
 
 final class TestShip implements WriteOnlyShip
 {
@@ -76,6 +72,14 @@ final class TestShip implements WriteOnlyShip
         }
 
         $this->colons = $this->colons->addColons($colons->toInt());
+    }
+
+    /**
+     * @param Colons $colons
+     */
+    public function unloadColons(Colons $colons)
+    {
+        $this->colons = $this->colons->removeColons($colons->toInt());
     }
 
     /**

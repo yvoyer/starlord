@@ -109,19 +109,17 @@ $builder->buyTransport(1010, 2); // turn 1
 // Other
 $armadas = new \StarLord\Infrastructure\Persistence\InMemory\ShipCollection(
         [
-                new TestShip($playerOne_s1 = new ShipId(400), $planet_1 = new PlanetId(500), 3),
+                new TestShip($playerOne_transport1 = new ShipId(400), $planet_1 = new PlanetId(500), 3),
         ]
 );
 $players = new \StarLord\Infrastructure\Persistence\InMemory\PlayerCollection();
-$world = new \StarLord\Domain\Model\Galaxy(
-        [
-            \StarLord\Domain\Model\ColoredPlanet::blue(),
-            \StarLord\Domain\Model\ColoredPlanet::green(),
-            \StarLord\Domain\Model\ColoredPlanet::purple(),
-            \StarLord\Domain\Model\ColoredPlanet::red(),
-            \StarLord\Domain\Model\ColoredPlanet::yellow(),
-        ]
-);
+$world = new \StarLord\Domain\Model\Galaxy([]);
+$world->savePlanet($planet_blue = new PlanetId(1), \StarLord\Domain\Model\ColoredPlanet::blue());
+$world->savePlanet($planet_green = new PlanetId(2), \StarLord\Domain\Model\ColoredPlanet::green());
+$world->savePlanet($planet_purple = new PlanetId(3), \StarLord\Domain\Model\ColoredPlanet::purple());
+$world->savePlanet($planet_red = new PlanetId(4), \StarLord\Domain\Model\ColoredPlanet::red());
+$world->savePlanet($planet_yellow = new PlanetId(5), \StarLord\Domain\Model\ColoredPlanet::yellow());
+
 $deck = $builder->createDeck();
 $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
 //    [
@@ -143,7 +141,7 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
 //    $performActionHandler = new \StarLord\Domain\Model\Commands\PerformActionHandlerTest($players, $actions, $publisher);
     $moveShipHandler = new \StarLord\Domain\Model\Commands\MoveShipHandler($players, $armadas, $world, $publisher);
     $loadColonsHandler = new \StarLord\Domain\Model\Commands\LoadColonsHandler($players, $armadas, $publisher);
-    $unloadColonsHandler = new \StarLord\Domain\Model\Commands\UnloadColonsHandler();
+    $unloadColonsHandler = new \StarLord\Domain\Model\Commands\UnloadColonsHandler($world, $armadas, $publisher);
     $endPlayerTurnHandler = new \StarLord\Domain\Model\Commands\EndPlayerTurnHandler($players, $publisher);
 }
 
@@ -226,9 +224,9 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 
 // todo colonize, draw cards at start of turn, move colons to planet
     $playCardHandler(new PlayCard($playerOne, 1012)); // Colonize planet
-    $loadColonsHandler(new LoadColons($playerOne, 2, $playerOne_s1));
-    $moveShipHandler(new MoveShip($playerOne, $playerOne_s1, $planet1));
-    $unloadColonsHandler(new UnloadColons($playerOne, 2, $planet2));
+    $loadColonsHandler(new LoadColons($playerOne, 2, $playerOne_transport1));
+    $moveShipHandler(new MoveShip($playerOne, $playerOne_transport1, $planet_blue));
+    $unloadColonsHandler(new UnloadColons($playerOne, $playerOne_transport1, 2));
     $endPlayerTurnHandler(new EndPlayerTurn($playerOne));
 
 //    $performActionHandler(new PerformAction($playerOne, $a_moveShip->name()));

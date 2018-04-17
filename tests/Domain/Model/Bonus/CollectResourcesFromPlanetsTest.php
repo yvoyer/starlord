@@ -5,7 +5,7 @@ namespace StarLord\Domain\Model\Bonus;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\TurnWasStarted;
-use StarLord\Domain\Model\Planet;
+use StarLord\Domain\Model\WriteOnlyPlanet;
 use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\World;
 use StarLord\Domain\Model\WriteOnlyPlayer;
@@ -58,7 +58,7 @@ final class CollectResourcesFromPlanetsTest extends TestCase
             ->expects($this->once())
             ->method('allColonizedPlanetsOfPlayer')
             ->with(1)
-            ->willReturn([$planet = $this->createMock(Planet::class)]);
+            ->willReturn([$planet = $this->createMock(WriteOnlyPlanet::class)]);
         $player
             ->expects($this->once())
             ->method('collectResourcesFromPlanet');

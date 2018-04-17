@@ -94,9 +94,9 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     }
 
     /**
-     * @param Planet $planet
+     * @param WriteOnlyPlanet $planet
      */
-    public function collectResourcesFromPlanet(Planet $planet)
+    public function collectResourcesFromPlanet(WriteOnlyPlanet $planet)
     {
         $planet->collectResources($this);
     }

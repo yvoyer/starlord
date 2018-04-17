@@ -26,7 +26,7 @@ final class PlanetId implements Identity
      */
     public function entityClass(): string
     {
-        return Planet::class;
+        return WriteOnlyPlanet::class;
     }
 
     /**

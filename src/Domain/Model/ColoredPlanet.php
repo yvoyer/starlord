@@ -8,11 +8,12 @@ use StarLord\Domain\Model\Bonus\GreenCrystal;
 use StarLord\Domain\Model\Bonus\PurpleCrystal;
 use StarLord\Domain\Model\Bonus\RedCrystal;
 use StarLord\Domain\Model\Bonus\YellowCrystal;
+use StarLord\Domain\Model\Exception\InvalidUsageException;
 
-final class ColoredPlanet implements Planet
+final class ColoredPlanet implements WriteOnlyPlanet
 {
     /**
-     * @var WriteOnlyPlayer
+     * @var PlayerId|null
      */
     private $owner;
 
@@ -21,9 +22,15 @@ final class ColoredPlanet implements Planet
      */
     private $crystal;
 
+    /**
+     * @var Colons
+     */
+    private $population;
+
     private function __construct(Crystal $generator)
     {
         $this->crystal = $generator;
+        $this->population = new Colons(0);
     }
 
     /**
@@ -48,16 +55,17 @@ final class ColoredPlanet implements Planet
      */
     public function isColonized(): bool
     {
-        return $this->owner instanceof WriteOnlyPlayer;
+        return (bool) $this->owner;
     }
 
     /**
-     * @param WriteOnlyPlayer $owner
+     * @param PlayerId $owner
+     * @param Colons $colons
      */
-    public function colonize(WriteOnlyPlayer $owner)
+    public function colonize(PlayerId $owner, Colons $colons)
     {
-//todo        $owner->colonize($this);
         $this->owner = $owner;
+        $this->population = $this->population->addColons($colons->toInt());
     }
 
     /**
@@ -75,41 +83,61 @@ final class ColoredPlanet implements Planet
     }
 
     /**
-     * @return Planet
+     * @return Colons
      */
-    public static function red(): Planet
+    public function population(): Colons
+    {
+        return $this->population;
+    }
+
+    /**
+     * @return PlayerId
+     */
+    public function ownerId(): PlayerId
+    {
+        if (! $this->isColonized()) {
+            throw new InvalidUsageException('Planet is not colonized yet, cannot return a valid owner.');
+        }
+
+        return $this->owner;
+    }
+
+    /**
+     * @return WriteOnlyPlanet
+     */
+    public static function red(): WriteOnlyPlanet
     {
         return new self(RedCrystal::withSize('small'));
     }
 
     /**
-     * @return Planet
+     * @return WriteOnlyPlanet
      */
-    public static function yellow(): Planet
+    public static function yellow(): WriteOnlyPlanet
     {
         return new self(YellowCrystal::withSize('small'));
     }
 
     /**
-     * @return Planet
+     * @return WriteOnlyPlanet
      */
-    public static function blue(): Planet
+    public static function blue(): WriteOnlyPlanet
     {
         return new self(BlueCrystal::withSize('small'));
     }
 
     /**
-     * @return Planet
+     * @return WriteOnlyPlanet
      */
-    public static function purple(): Planet
+    public static function purple(): WriteOnlyPlanet
     {
         return new self(PurpleCrystal::withSize('small'));
     }
 
     /**
-     * @return Planet
+     * @return WriteOnlyPlanet
      */
-    public static function green(): Planet
+    public static function green(): WriteOnlyPlanet
     {
         return new self(GreenCrystal::withSize('small'));
     }

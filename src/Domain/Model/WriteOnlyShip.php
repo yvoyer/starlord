@@ -18,4 +18,9 @@ interface WriteOnlyShip extends ReadOnlyShip
      * @param Colons $colons
      */
     public function loadColons(Colons $colons);
+
+    /**
+     * @param Colons $colons
+     */
+    public function unloadColons(Colons $colons);
 }

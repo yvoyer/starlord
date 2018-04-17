@@ -8,21 +8,21 @@ use Webmozart\Assert\Assert;
 final class Galaxy implements World
 {
     /**
-     * @var Planet[]
+     * @var WriteOnlyPlanet[]
      */
     private $planets;
 
     /**
-     * @param Planet[] $planets
+     * @param WriteOnlyPlanet[] $planets
      */
     public function __construct(array $planets)
     {
-        Assert::allIsInstanceOf($planets, Planet::class);
+        Assert::allIsInstanceOf($planets, WriteOnlyPlanet::class);
         $this->planets = $planets;
     }
 
     /**
-     * @return Planet[]
+     * @return WriteOnlyPlanet[]
      */
     public function allPlanets(): array
     {
@@ -32,11 +32,11 @@ final class Galaxy implements World
     /**
      * @param int $playerId
      *
-     * @return Planet[]
+     * @return WriteOnlyPlanet[]
      */
     public function allColonizedPlanetsOfPlayer(int $playerId): array
     {
-        return array_filter($this->planets, function (Planet $planet) {
+        return array_filter($this->planets, function (WriteOnlyPlanet $planet) {
             return $planet->isColonized();
         });
     }
@@ -44,12 +44,25 @@ final class Galaxy implements World
     /**
      * @param PlanetId $id
      *
-     * @return Planet
+     * @return WriteOnlyPlanet
      * @throws EntityNotFoundException
      */
-    public function planetWithId(PlanetId $id): Planet
+    public function planetWithId(PlanetId $id): WriteOnlyPlanet
     {
-        throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
+        if (! isset($this->planets[$id->toString()])) {
+            throw EntityNotFoundException::objectWithIdentity($id);
+        }
+
+        return $this->planets[$id->toString()];
+    }
+
+    /**
+     * @param PlanetId $id
+     * @param WriteOnlyPlanet $planet
+     */
+    public function savePlanet(PlanetId $id, WriteOnlyPlanet $planet)
+    {
+        $this->planets[$id->toString()] = $planet;
     }
 
     /**

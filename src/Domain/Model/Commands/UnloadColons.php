@@ -13,25 +13,28 @@ final class UnloadColons
     private $playerId;
 
     /**
-     * @var int
-     */
-    private $quantity;
-
-    /**
      * @var ShipId
      */
     private $shipId;
 
     /**
-     * @param PlayerId $playerId
-     * @param int $quantity
-     * @param ShipId $shipId
+     * @var int
      */
-    public function __construct(PlayerId $playerId, int $quantity, ShipId $shipId)
-    {
+    private $quantity;
+
+    /**
+     * @param PlayerId $playerId
+     * @param ShipId $shipId
+     * @param int $quantity
+     */
+    public function __construct(
+        PlayerId $playerId,
+        ShipId $shipId,
+        int $quantity
+    ) {
         $this->playerId = $playerId;
-        $this->quantity = $quantity;
         $this->shipId = $shipId;
+        $this->quantity = $quantity;
     }
 
     /**

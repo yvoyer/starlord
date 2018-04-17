@@ -10,7 +10,7 @@ use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\ShipId;
 use StarLord\Domain\Model\TestPlayer;
-use StarLord\Infrastructure\Model\Testing\TestShip;
+use StarLord\Domain\Model\TestShip;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 use StarLord\Infrastructure\Persistence\InMemory\ShipCollection;
 
@@ -100,8 +100,12 @@ final class MoveShipHandlerTest extends TestCase
             ->method('publish')
             ->with($this->isInstanceOf(ShipWasMoved::class));
 
-        $this->player->startAction();
-        $this->handler->__invoke(MoveShip::fromInt(1, 2, 3));
-        $this->fail('todo');
+        $this->handler->__invoke(
+            new MoveShip(
+                $this->player->getIdentity(),
+                $this->ship->getIdentity(),
+                new PlanetId(3)
+            )
+        );
     }
 }

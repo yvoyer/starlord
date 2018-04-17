@@ -12,10 +12,10 @@ interface WriteOnlyPlayer extends ReadOnlyPlayer
     public function getIdentity(): PlayerId;
 
     /**
-     * @param Planet $planet
+     * @param WriteOnlyPlanet $planet
      * @deprecated todo remove
      */
-    public function collectResourcesFromPlanet(Planet $planet);
+    public function collectResourcesFromPlanet(WriteOnlyPlanet $planet);
 
     /**
      * Collect resources from owned crystals

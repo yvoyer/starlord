@@ -9,20 +9,26 @@ interface World
     /**
      * @param int $playerId
      *
-     * @return Planet[]
+     * @return WriteOnlyPlanet[]
      */
     public function allColonizedPlanetsOfPlayer(int $playerId): array;
 
     /**
-     * @return Planet[]
+     * @return WriteOnlyPlanet[]
      */
     public function allPlanets(): array;
 
     /**
      * @param PlanetId $id
      *
-     * @return Planet
+     * @return WriteOnlyPlanet
      * @throws EntityNotFoundException
      */
-    public function planetWithId(PlanetId $id): Planet;
+    public function planetWithId(PlanetId $id): WriteOnlyPlanet;
+
+    /**
+     * @param PlanetId $id
+     * @param WriteOnlyPlanet $planet
+     */
+    public function savePlanet(PlanetId $id, WriteOnlyPlanet $planet);
 }

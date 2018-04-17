@@ -3,6 +3,7 @@
 namespace StarLord\Domain\Model;
 
 use PHPUnit\Framework\TestCase;
+use StarLord\Domain\Model\Exception\InvalidUsageException;
 
 final class ColoredPlanetTest extends TestCase
 {
@@ -97,12 +98,33 @@ final class ColoredPlanetTest extends TestCase
     }
 
     /**
-     * @param Planet $planet
+     * @param WriteOnlyPlanet $planet
      */
-    private function assertPlanetIsColonized(Planet $planet)
+    private function assertPlanetIsColonized(WriteOnlyPlanet $planet)
     {
         $this->assertFalse($planet->isColonized());
-        $planet->colonize($this->player);
+        $planet->colonize($this->player->getIdentity(), new Colons(0));
         $this->assertTrue($planet->isColonized());
+        $this->assertEquals(new PlayerId(1), $planet->ownerId());
+    }
+
+    public function test_it_should_increase_population_when_colonized_by_any_players()
+    {
+        $planet = ColoredPlanet::green();
+        $this->assertSame(0, $planet->population()->toInt());
+        $planet->colonize(new PlayerId(1), new Colons(2));
+        $this->assertSame(2, $planet->population()->toInt());
+        $planet->colonize(new PlayerId(2), new Colons(2));
+        $this->assertSame(4, $planet->population()->toInt());
+    }
+
+    public function test_it_should_throw_exception_when_fetching_owner_on_planet_not_colonized()
+    {
+        $planet = ColoredPlanet::yellow();
+        $this->assertFalse($planet->isColonized());
+
+        $this->expectException(InvalidUsageException::class);
+        $this->expectExceptionMessage('Planet is not colonized yet, cannot return a valid owner.');
+        $planet->ownerId();
     }
 }

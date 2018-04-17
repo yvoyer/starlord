@@ -2,12 +2,13 @@
 
 namespace StarLord\Domain\Model;
 
-interface Planet extends Card
+interface WriteOnlyPlanet extends Card, ReadOnlyPlanet
 {
     /**
-     * @param WriteOnlyPlayer $owner
+     * @param PlayerId $owner
+     * @param Colons $colons
      */
-    public function colonize(WriteOnlyPlayer $owner);
+    public function colonize(PlayerId $owner, Colons $colons);
 
     /**
      * @return bool
