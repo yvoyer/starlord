@@ -4,10 +4,15 @@ namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Credit;
+use StarLord\Domain\Model\UserActionStore;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 use Webmozart\Assert\Assert;
 
-final class BuildColonists implements Card
+/**
+ * Pay 5 credit
+ * Place a small crystal of the planet color on planet of choice
+ */
+final class MinePlanet implements Card
 {
     /**
      * @var int
@@ -28,8 +33,10 @@ final class BuildColonists implements Card
      */
     public function whenPlayedBy(WriteOnlyPlayer $player)
     {
-        $player->pay(new Credit(2));
-        $player->addColons($this->quantity);
+        // todo make cost configurable
+        $player->pay(new Credit(5));
+        // todo should add actions based on quantity
+        $player->startAction([UserActionStore::MINE_PLANET]);
     }
 
     /**

@@ -4,7 +4,6 @@ namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Credit;
-use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\UserActionStore;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
@@ -24,23 +23,18 @@ final class ColonizePlanet implements Card
     }
 
     /**
-     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    public function play(PlayerId $playerId, WriteOnlyPlayer $player)
+    public function whenPlayedBy(WriteOnlyPlayer $player)
     {
-        // pay credit
         $player->pay($this->cost);
-        // player may be RuleContext
-        // on start of context, a rule can be built
-        // todo on start ation, create a ruleset that will be validated on perform
-        $player->startAction([UserActionStore::moveShip()]);
+        $player->startAction([UserActionStore::MOVE_SHIP]);
     }
 
     /**
      * @param WriteOnlyPlayer $player
      */
-    public function draw(WriteOnlyPlayer $player)
+    public function whenDraw(WriteOnlyPlayer $player)
     {
     }
 }

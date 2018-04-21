@@ -8,6 +8,7 @@ use StarLord\Domain\Model\Bonus\GreenCrystal;
 use StarLord\Domain\Model\Bonus\PurpleCrystal;
 use StarLord\Domain\Model\Bonus\RedCrystal;
 use StarLord\Domain\Model\Bonus\YellowCrystal;
+use StarLord\Domain\Model\Exception\InvalidPlanetOwnerException;
 use StarLord\Domain\Model\Exception\InvalidUsageException;
 
 final class ColoredPlanet implements WriteOnlyPlanet
@@ -18,7 +19,7 @@ final class ColoredPlanet implements WriteOnlyPlanet
     private $owner;
 
     /**
-     * @var Crystal
+     * @var Crystal todo change to color
      */
     private $crystal;
 
@@ -27,17 +28,50 @@ final class ColoredPlanet implements WriteOnlyPlanet
      */
     private $population;
 
+    /**
+     * @var Stash
+     */
+    private $stash;
+
     private function __construct(Crystal $generator)
     {
         $this->crystal = $generator;
         $this->population = new Colons(0);
+        $this->stash = Stash::emptyStash();
+    }
+
+    /**
+     * @return Stash
+     */
+    public function stash(): Stash
+    {
+        return $this->stash;
     }
 
     /**
      * @param PlayerId $playerId
+     */
+    public function mine(PlayerId $playerId)
+    {
+        if (! $this->isColonized()) {
+            throw new InvalidPlanetOwnerException('Cannot mine a planet that was never colonized.');
+        }
+
+        if (! $playerId->match($this->owner)) {
+            throw new InvalidPlanetOwnerException('Cannot mine a planet that you do not own.');
+        }
+
+        $this->stash = $this->stash->addCrystal(
+            Crystal::fromString(
+                $this->crystal->color(), 'small'
+            )
+        );
+    }
+
+    /**
      * @param WriteOnlyPlayer $player
      */
-    public function play(PlayerId $playerId, WriteOnlyPlayer $player)
+    public function whenPlayedBy(WriteOnlyPlayer $player)
     {
         throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
     }
@@ -45,7 +79,7 @@ final class ColoredPlanet implements WriteOnlyPlanet
     /**
      * @param WriteOnlyPlayer $player
      */
-    public function draw(WriteOnlyPlayer $player)
+    public function whenDraw(WriteOnlyPlayer $player)
     {
         throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
     }

@@ -27,7 +27,7 @@ final class BuildTransportTest extends TestCase
 
         $this->assertSame(10, $player->getCredit()->toInt());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(8, $player->getCredit()->toInt());
     }
@@ -41,7 +41,7 @@ final class BuildTransportTest extends TestCase
 
         $this->assertSame(0, $player->getArmada()->transports());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(1, $player->getArmada()->transports());
     }

@@ -47,11 +47,9 @@ final class PlayerState extends StateMetadata
     }
 
     /**
-     * @param UserAction $action
-     *
      * @return PlayerState
      */
-    public function performAction(UserAction $action): self
+    public function performAction(): self
     {
         return $this->transit(self::T_PERFORM_ACTION, 'player');
     }

@@ -4,7 +4,6 @@ namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Cost;
-use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
 abstract class Spaceship implements Card
@@ -23,10 +22,9 @@ abstract class Spaceship implements Card
     }
 
     /**
-     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    final public function play(PlayerId $playerId, WriteOnlyPlayer $player)
+    final public function whenPlayedBy(WriteOnlyPlayer $player)
     {
         $player->pay($this->getCost());
         $this->onPlay($this->quantity, $player);
@@ -35,7 +33,7 @@ abstract class Spaceship implements Card
     /**
      * @param WriteOnlyPlayer $player
      */
-    final public function draw(WriteOnlyPlayer $player)
+    final public function whenDraw(WriteOnlyPlayer $player)
     {
         // do nothing
     }

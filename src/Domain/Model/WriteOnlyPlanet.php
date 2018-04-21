@@ -2,6 +2,8 @@
 
 namespace StarLord\Domain\Model;
 
+use StarLord\Domain\Model\Exception\InvalidPlanetOwnerException;
+
 interface WriteOnlyPlanet extends Card, ReadOnlyPlanet
 {
     /**
@@ -9,6 +11,12 @@ interface WriteOnlyPlanet extends Card, ReadOnlyPlanet
      * @param Colons $colons
      */
     public function colonize(PlayerId $owner, Colons $colons);
+
+    /**
+     * @param PlayerId $playerId
+     * @throws InvalidPlanetOwnerException
+     */
+    public function mine(PlayerId $playerId);
 
     /**
      * @return bool

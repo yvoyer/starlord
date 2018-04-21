@@ -31,11 +31,20 @@ interface WriteOnlyPlayer extends ReadOnlyPlayer
 
     /**
      * @param int $cardId
+     *
+     * @return Card
      */
-    public function playCard(int $cardId);
+    public function playCard(int $cardId): Card;
 
     /**
-     * @param UserAction[] $requiredActions The required actions needed to finish the action.
+     * @param int $cardId
+     *
+     * @return bool
+     */
+    public function hasCardInHand(int $cardId): bool;
+
+    /**
+     * @param string[] $requiredActions The required actions needed to finish the action.
      */
     public function startAction(array $requiredActions = []);
 

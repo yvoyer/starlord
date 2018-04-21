@@ -44,7 +44,7 @@ final class PlayerCollection implements WriteOnlyPlayers, \Countable
     public function getPlayerWithId(PlayerId $id): WriteOnlyPlayer
     {
         if (! $this->playerExists($id)) {
-            throw new \RuntimeException("Player with id '{$id}' do not exists.");
+            throw new \RuntimeException("Player with id '{$id->toString()}' do not exists.");
         }
 
         return $this->players[$id->toString()];

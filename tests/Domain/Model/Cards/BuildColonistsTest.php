@@ -12,11 +12,11 @@ final class BuildColonistsTest extends TestCase
     {
         $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
-        $player->drawCard(1, new BuildColonists(1));
+        $player->drawCard(1, $card = new BuildColonists(1));
 
         $this->assertSame(10, $player->getCredit()->toInt());
 
-        $player->playCard(1);
+        $card->whenPlayedBy($player);
 
         $this->assertSame(8, $player->getCredit()->toInt());
     }
@@ -25,11 +25,11 @@ final class BuildColonistsTest extends TestCase
     {
         $player = TestPlayer::fromInt(1);
         $player->addCredit(new Credit(10));
-        $player->drawCard(1, new BuildColonists(3));
+        $player->drawCard(1, $card = new BuildColonists(3));
 
         $this->assertSame(0, $player->getPopulation()->toInt());
 
-        $player->playCard(1);
+        $card->whenPlayedBy($player);
 
         $this->assertSame(3, $player->getPopulation()->toInt());
     }

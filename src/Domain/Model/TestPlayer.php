@@ -3,8 +3,10 @@
 namespace StarLord\Domain\Model;
 
 use Assert\Assertion;
+use Star\Component\Identity\Exception\EntityNotFoundException;
 use StarLord\Domain\Model\Bonus\Crystal;
-use StarLord\Domain\Model\Cards\NotFoundCard;
+use StarLord\Domain\Model\Exception\NotCompletedActionException;
+use StarLord\Domain\Model\Exception\PlayerActionException;
 
 class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 {
@@ -69,6 +71,11 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     private $state;
 
     /**
+     * @var string[]
+     */
+    private $remainingActions = [];
+
+    /**
      * @param PlayerId $playerId
      */
     private function __construct(PlayerId $playerId)
@@ -124,20 +131,24 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
                 )
             );
         }
-        $card->draw($this);
+        $card->whenDraw($this);
         $this->hand[$cardId] = $card;
     }
 
     /**
      * @param int $cardId
+     *
+     * @return Card
      */
-    public function playCard(int $cardId)
+    public function playCard(int $cardId): Card
     {
         $card = $this->getCardFromHand($cardId);
-        $card->play($this->id, $this);
+//        $card->play($this->id, $this);
 
         $this->battlefield[$cardId] = $card;
         unset($this->hand[$cardId]);
+
+        return $card;
     }
 
     /**
@@ -155,8 +166,49 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 
     public function startAction(array $requiredActions = [])
     {
-        Assertion::allIsInstanceOf($requiredActions, ActionName::class);
+        Assertion::allString($requiredActions);
         $this->state = $this->state->startAction();
+        $this->remainingActions = $requiredActions;
+    }
+
+    /**
+     * @param UserAction $action
+     */
+    public function performAction(UserAction $action)
+    {
+        $this->state = $this->state->performAction();
+        $key = array_search($action->actionName(), $this->remainingActions);
+        if (false === $key) {
+            throw new PlayerActionException(
+                sprintf(
+                    'Cannot perform the action "%s" when it is not required.',
+                    $action->actionName()
+                )
+            );
+        }
+
+        unset($this->remainingActions[$key]);
+    }
+
+    public function endTurn()
+    {
+        $this->state = $this->state->endTurn();
+        if (! $this->actionsAreCompleted()) {
+            throw new NotCompletedActionException(
+                sprintf(
+                    'Cannot end turn when remaining actions are required %s.',
+                    json_encode($this->remainingActions)
+                )
+            );
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function actionsAreCompleted(): bool
+    {
+        return empty($this->remainingActions);
     }
 
     /**
@@ -167,15 +219,12 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         $this->colons = $this->colons->removeColons($colons->toInt());
     }
 
-    public function performAction(UserAction $action)
+    /**
+     * @return string[]
+     */
+    public function remainingActions(): array
     {
-        $this->state = $this->state->performAction($action);
-        $action->perform($this);
-    }
-
-    public function endTurn()
-    {
-        $this->state = $this->state->endTurn();
+        return $this->remainingActions;
     }
 
     /**
@@ -372,18 +421,16 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 
     /**
      * @param int $cardId
-     *
      * @return Card
-     * @throws \LogicException
+     * @throws EntityNotFoundException
      */
     private function getCardFromHand(int $cardId): Card
     {
-        $card = new NotFoundCard($cardId);
-        if ($this->hasCardInHand($cardId)) {
-            $card =$this->hand[$cardId];
+        if (! $this->hasCardInHand($cardId)) {
+            throw EntityNotFoundException::objectWithAttribute(Card::class, 'id', $cardId);
         }
 
-        return $card;
+        return $this->hand[$cardId];
     }
 
     /**

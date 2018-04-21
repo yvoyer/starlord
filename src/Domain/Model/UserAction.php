@@ -8,13 +8,7 @@ namespace StarLord\Domain\Model;
 interface UserAction
 {
     /**
-     * @return ActionName
+     * @return string
      */
-    public function name(): ActionName;
-
-    /**
-     * @param WriteOnlyPlayer $player todo could be an ActionContext instead
-     * todo rename to execute()
-     */
-    public function perform(WriteOnlyPlayer $player);
+    public function actionName(): string;
 }

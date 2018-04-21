@@ -5,13 +5,12 @@ namespace StarLord\Domain\Model;
 interface Card
 {
     /**
-     * @param PlayerId $playerId
-     * @param WriteOnlyPlayer $player
+     * @param WriteOnlyPlayer $player // todo Replace with CardPlayer
      */
-    public function play(PlayerId $playerId, WriteOnlyPlayer $player);
+    public function whenPlayedBy(WriteOnlyPlayer $player);
 
     /**
-     * @param WriteOnlyPlayer $player
+     * @param WriteOnlyPlayer $player // todo replace with CardPlayer
      */
-    public function draw(WriteOnlyPlayer $player);
+    public function whenDraw(WriteOnlyPlayer $player);
 }

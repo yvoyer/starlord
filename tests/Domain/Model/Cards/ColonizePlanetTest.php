@@ -5,7 +5,6 @@ namespace StarLord\Domain\Model\Cards;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Model\Credit;
-use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\UserActionStore;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
@@ -32,9 +31,9 @@ final class ColonizePlanetTest extends TestCase
         $this->player
             ->expects($this->once())
             ->method('startAction')
-            ->with([UserActionStore::moveShip()]);
+            ->with([UserActionStore::MOVE_SHIP]);
 
-        $this->card->play(new PlayerId(1), $this->player);
+        $this->card->whenPlayedBy($this->player);
     }
 
     public function test_it_should_cost_credit_to_colonize()
@@ -44,6 +43,6 @@ final class ColonizePlanetTest extends TestCase
             ->method('pay')
             ->with(new Credit(2));
 
-        $this->card->play(new PlayerId(1), $this->player);
+        $this->card->whenPlayedBy($this->player);
     }
 }

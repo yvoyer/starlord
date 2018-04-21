@@ -29,7 +29,7 @@ final class BuildCruiserTest extends TestCase
 
         $this->assertSame(10, $player->getCredit()->toInt());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(5, $player->getCredit()->toInt());
     }
@@ -44,7 +44,7 @@ final class BuildCruiserTest extends TestCase
 
         $this->assertSame(10, $player->getDeuterium()->toInt());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(9, $player->getDeuterium()->toInt());
     }
@@ -59,7 +59,7 @@ final class BuildCruiserTest extends TestCase
 
         $this->assertSame(0, $player->getArmada()->cruisers());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(1, $player->getArmada()->cruisers());
     }

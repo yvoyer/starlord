@@ -40,6 +40,16 @@ final class PlayerId implements Identity
     }
 
     /**
+     * @param PlayerId $id
+     *
+     * @return bool
+     */
+    public function match(PlayerId $id): bool
+    {
+        return $this->toInt() === $id->toInt();
+    }
+
+    /**
      * @return int
      */
     public function toInt(): int

@@ -140,9 +140,7 @@ final class TestShip implements WriteOnlyShip
      */
     public static function transport(int $shipId, int $planetId): self
     {
-        $ship = self::fromInt($shipId, $planetId, 3);
-
-        return $ship;
+        return self::fromInt($shipId, $planetId, 3);
     }
 
     /**
@@ -153,9 +151,7 @@ final class TestShip implements WriteOnlyShip
      */
     public static function cruiser(int $shipId, int $planetId): self
     {
-        $ship = self::fromInt($shipId, $planetId, 1);
-
-        return $ship;
+        return self::fromInt($shipId, $planetId, 1);
     }
 
     /**

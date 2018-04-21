@@ -3,7 +3,6 @@
 namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
-use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
 final class NotFoundCard implements Card
@@ -22,16 +21,15 @@ final class NotFoundCard implements Card
     }
 
     /**
-     * @param PlayerId $playerId
      * @param WriteOnlyPlayer $player
      */
-    public function play(PlayerId $playerId, WriteOnlyPlayer $player)
+    public function whenPlayedBy(WriteOnlyPlayer $player)
     {
         throw new \LogicException(
             sprintf(
                 'Card with id "%s" is not in hand of player "%s".',
                 $this->cardId,
-                $playerId->toString()
+                $player->getIdentity()->toString()
             )
         );
     }
@@ -39,7 +37,7 @@ final class NotFoundCard implements Card
     /**
      * @param WriteOnlyPlayer $player
      */
-    public function draw(WriteOnlyPlayer $player)
+    public function whenDraw(WriteOnlyPlayer $player)
     {
         throw new \LogicException(
             sprintf(

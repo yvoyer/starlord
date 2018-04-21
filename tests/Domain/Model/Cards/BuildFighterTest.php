@@ -27,7 +27,7 @@ final class BuildFighterTest extends TestCase
 
         $this->assertSame(10, $player->getCredit()->toInt());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(7, $player->getCredit()->toInt());
     }
@@ -41,7 +41,7 @@ final class BuildFighterTest extends TestCase
 
         $this->assertSame(0, $player->getArmada()->fighters());
 
-        $player->playCard($cardId);
+        $this->card->whenPlayedBy($player);
 
         $this->assertSame(1, $player->getArmada()->fighters());
     }

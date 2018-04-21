@@ -4,11 +4,12 @@ namespace StarLord\Domain\Model\Commands;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Star\Component\State\InvalidStateTransitionException;
 use StarLord\Domain\Events\PlayerTurnHasEnded;
 use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\TestPlayer;
-use StarLord\Domain\Model\UserAction;
+use StarLord\Infrastructure\Model\Testing\StringAction;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 
 final class EndPlayerTurnHandlerTest extends TestCase
@@ -38,8 +39,8 @@ final class EndPlayerTurnHandlerTest extends TestCase
 
     public function test_it_should_end_the_player_turn_when_action_was_performed()
     {
-        $this->player->startAction();
-        $this->player->performAction($this->createMock(UserAction::class));
+        $this->player->startAction(['action']);
+        $this->player->performAction(new StringAction('action'));
         $this->assertTrue($this->player->isPlaying());
         $this->assertFalse($this->player->hasPlayed());
 
@@ -65,8 +66,8 @@ final class EndPlayerTurnHandlerTest extends TestCase
      */
     public function test_it_should_not_allow_to_end_turn_when_turn_already_ended()
     {
-        $this->player->startAction();
-        $this->player->performAction($this->createMock(UserAction::class));
+        $this->player->startAction(['action']);
+        $this->player->performAction(new StringAction('action'));
         $this->player->endTurn();
         $this->assertTrue($this->player->hasPlayed());
 
@@ -81,6 +82,16 @@ final class EndPlayerTurnHandlerTest extends TestCase
             ->method('publish')
             ->with($this->isInstanceOf(PlayerTurnHasEnded::class));
 
+        $this->handler->__invoke(new EndPlayerTurn(new PlayerId(1)));
+    }
+
+    public function test_it_should_not_allow_to_end_player_turn_when_required_action_were_not_performed()
+    {
+        $this->assertFalse($this->player->isPlaying());
+        $this->expectException(InvalidStateTransitionException::class);
+        $this->expectExceptionMessage(
+            "The transition 'end-turn' is not allowed when context 'player' is in state 'waiting'."
+        );
         $this->handler->__invoke(new EndPlayerTurn(new PlayerId(1)));
     }
 }

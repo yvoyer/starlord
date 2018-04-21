@@ -3,6 +3,7 @@
 namespace StarLord\Domain\Model\Cards;
 
 use PHPUnit\Framework\TestCase;
+use Star\Component\Identity\Exception\EntityNotFoundException;
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
@@ -46,10 +47,9 @@ final class CardStackTest extends TestCase
     public function test_it_should_throw_exception_when_card_not_found()
     {
         $stack = new CardStack([]);
-        $card = $stack->drawCard(1);
+        $this->expectException(EntityNotFoundException::class);
+        $this->expectExceptionMessage("Object of class 'StarLord\Domain\Model\Card' with id '1' could not be found.");
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Card with id "1" was not found in deck.');
-        $card->draw($this->createMock(WriteOnlyPlayer::class));
+        $stack->drawCard(1);
     }
 }

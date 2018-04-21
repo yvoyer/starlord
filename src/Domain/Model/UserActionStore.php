@@ -7,16 +7,11 @@ namespace StarLord\Domain\Model;
  */
 final class UserActionStore
 {
+    const MOVE_SHIP = 'move-ship';
+    const MINE_PLANET = 'mine-planet';
+
     private function __construct()
     {
         // constant store
-    }
-
-    /**
-     * @return ActionName
-     */
-    public static function moveShip(): ActionName
-    {
-        return new ActionName('move-ship');
     }
 }

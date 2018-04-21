@@ -4,10 +4,13 @@ namespace StarLord\Domain\Model;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Star\Component\State\InvalidStateTransitionException;
+use Star\Component\Identity\Exception\EntityNotFoundException;
 use StarLord\Domain\Model\Bonus\BlueCrystal;
 use StarLord\Domain\Model\Bonus\GreenCrystal;
 use StarLord\Domain\Model\Bonus\YellowCrystal;
+use StarLord\Domain\Model\Exception\NotCompletedActionException;
+use StarLord\Domain\Model\Exception\PlayerActionException;
+use StarLord\Infrastructure\Model\Testing\StringAction;
 
 final class TestPlayerTest extends TestCase
 {
@@ -21,15 +24,9 @@ final class TestPlayerTest extends TestCase
      */
     private $card;
 
-    /**
-     * @var UserAction|MockObject
-     */
-    private $action;
-
     public function setUp()
     {
         $this->card = $this->createMock(Card::class);
-        $this->action = $this->createMock(UserAction::class);
         $this->player = TestPlayer::fromInt(99);
     }
 
@@ -67,8 +64,8 @@ final class TestPlayerTest extends TestCase
     {
         $this->assertFalse($this->player->hasCardInHand(34));
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Card with id "34" is not in hand of player "99".');
+        $this->expectException(EntityNotFoundException::class);
+        $this->expectExceptionMessage("Object of class 'StarLord\Domain\Model\Card' with id '34' could not be found.");
         $this->player->playCard(34);
     }
 
@@ -227,5 +224,32 @@ final class TestPlayerTest extends TestCase
         $this->player->startAction();
 
         $this->assertTrue($this->player->isPlaying());
+    }
+
+    public function test_it_should_not_allow_to_end_turn_when_required_actions_are_not_performed()
+    {
+        $this->player->startAction(['action']);
+        $this->expectException(NotCompletedActionException::class);
+        $this->expectExceptionMessage('Cannot end turn when remaining actions are required ["action"].');
+        $this->player->endTurn();
+    }
+
+    public function test_it_should_remove_action_when_performed()
+    {
+        $this->player->startAction(['action']);
+        $this->assertCount(1, $this->player->remainingActions());
+
+        $this->player->performAction(new StringAction('action'));
+
+        $this->assertCount(0, $this->player->remainingActions());
+    }
+
+    public function test_it_should_not_allow_to_perform_not_required_action()
+    {
+        $this->player->startAction([]);
+
+        $this->expectException(PlayerActionException::class);
+        $this->expectExceptionMessage('Cannot perform the action "action" when it is not required.');
+        $this->player->performAction(new StringAction('action'));
     }
 }

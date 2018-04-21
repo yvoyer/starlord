@@ -5,7 +5,6 @@ namespace StarLord\Domain\Model\Cards;
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Credit;
 use StarLord\Domain\Model\Deck;
-use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
 final class DeckBuilder
@@ -35,10 +34,9 @@ final class DeckBuilder
             }
 
             /**
-             * @param PlayerId $playerId
              * @param WriteOnlyPlayer $player
              */
-            public function play(PlayerId $playerId, WriteOnlyPlayer $player)
+            public function whenPlayedBy(WriteOnlyPlayer $player)
             {
                 throw new \RuntimeException("Card with id '{$this->cardId}' is not defined yet.");
             }
@@ -46,7 +44,7 @@ final class DeckBuilder
             /**
              * @param WriteOnlyPlayer $player
              */
-            public function draw(WriteOnlyPlayer $player)
+            public function whenDraw(WriteOnlyPlayer $player)
             {
             }
         });
@@ -55,12 +53,13 @@ final class DeckBuilder
     /**
      * @param int $cardId
      * @param int $quantity
-     * @param string $color
-     * @param string $size
      */
-    public function mineCrystal(int $cardId, int $quantity, string $color, string $size)
+    public function minePlanet(int $cardId, int $quantity)
     {
-        $this->addCard($cardId, MineCrystal::fromColor($quantity, $color, $size));
+        $this->addCard(
+            $cardId,
+            new MinePlanet($quantity)
+        );
     }
 
     /**
@@ -108,6 +107,14 @@ final class DeckBuilder
      * @return Deck
      */
     public function createDeck(): Deck
+    {
+        return new CardStack($this->cards);
+    }
+
+    /**
+     * @return CardRegistry
+     */
+    public function createRegistry(): CardRegistry
     {
         return new CardStack($this->cards);
     }

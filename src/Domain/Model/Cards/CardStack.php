@@ -2,11 +2,12 @@
 
 namespace StarLord\Domain\Model\Cards;
 
+use Star\Component\Identity\Exception\EntityNotFoundException;
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Deck;
 use Webmozart\Assert\Assert;
 
-final class CardStack implements Deck
+final class CardStack implements Deck, CardRegistry
 {
     /**
      * @var Card[]
@@ -42,17 +43,29 @@ final class CardStack implements Deck
      * Remove the card from the deck
      *
      * @param int $cardId
-     *
      * @return Card
+     * @throws EntityNotFoundException
      */
     public function drawCard(int $cardId): Card
     {
-        $card = new NotFoundCard($cardId);
-        if (isset($this->cards[$cardId])) {
-            $card = $this->cards[$cardId];
-        }
+        $card = $this->getCardWithId($cardId);
         unset($this->cards[$cardId]);
 
         return $card;
+    }
+
+    /**
+     * @param int $cardId
+     *
+     * @return Card
+     * @throws EntityNotFoundException
+     */
+    public function getCardWithId(int $cardId): Card
+    {
+        if (! isset($this->cards[$cardId])) {
+            throw EntityNotFoundException::objectWithAttribute(Card::class, 'id', $cardId);
+        }
+
+        return $this->cards[$cardId];
     }
 }

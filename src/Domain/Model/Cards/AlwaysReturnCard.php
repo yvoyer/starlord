@@ -2,10 +2,11 @@
 
 namespace StarLord\Domain\Model\Cards;
 
+use Star\Component\Identity\Exception\EntityNotFoundException;
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Deck;
 
-final class AlwaysReturnCard implements Deck
+final class AlwaysReturnCard implements Deck, CardRegistry
 {
     /**
      * @var int
@@ -45,6 +46,17 @@ final class AlwaysReturnCard implements Deck
      * @return Card
      */
     public function drawCard(int $cardId): Card
+    {
+        return $this->card;
+    }
+
+    /**
+     * @param int $cardId
+     *
+     * @return Card
+     * @throws EntityNotFoundException
+     */
+    public function getCardWithId(int $cardId): Card
     {
         return $this->card;
     }

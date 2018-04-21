@@ -2,9 +2,12 @@
 Example game
 --FILE--
 <?php
+
+use StarLord\Domain\Model\ColoredPlanet;
 use StarLord\Domain\Model\Commands\EndPlayerTurn;
 use StarLord\Domain\Model\Commands\EndTurn;
 use StarLord\Domain\Model\Commands\LoadColons;
+use StarLord\Domain\Model\Commands\MinePlanet;
 use StarLord\Domain\Model\Commands\MoveShip;
 use StarLord\Domain\Model\Commands\PlayCard;
 use StarLord\Domain\Model\Commands\StartGame;
@@ -13,7 +16,7 @@ use StarLord\Domain\Model\GameSettings;
 use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\ShipId;
-use StarLord\Infrastructure\Model\Testing\TestShip;
+use StarLord\Domain\Model\TestShip;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -40,12 +43,12 @@ $publisher = new class() implements \StarLord\Domain\Model\Publisher {
         $method = 'on' . ucfirst(substr($class, strrpos($class, '\\') + 1));
 
         foreach ($this->subscribers as $subscriber) {
-            $listener = get_class($subscriber);
             if (method_exists($subscriber, $method)) {
                 $data = $event->serialize();
                 $this->logger->log("Publish event: '{$data}'.\n");
                 $subscriber->{$method}($event);
-            } else {
+//            } else {
+//                $listener = get_class($subscriber);
 //                $this->logger->log("Skip listener '{$listener}' for event: '{$class}'. \n");
             }
         }
@@ -89,38 +92,40 @@ $builder->addPendingCard(1015);
 $builder->addPendingCard(1004);
 $builder->addPendingCard(1003);
 $builder->addPendingCard(1002);
-$builder->mineCrystal(1001, 1, 'green', 'small'); // turn 2
-$builder->mineCrystal(1000, 1, 'yellow', 'small'); // turn 1
+$builder->minePlanet(1001, 1); // turn 2
+$builder->minePlanet(1000, 1); // turn 1
 
 // Cards in player 2 hands
 $builder->addPendingCard(1009);
 $builder->addPendingCard(1008);
 $builder->addPendingCard(1007);
-$builder->mineCrystal(1006, 1, 'purple', 'small'); // turn 2
+$builder->minePlanet(1006, 1); // turn 2
 $builder->buildColonists(1005); // turn 1
 
 // Cards in player 1 hands
 $builder->addPendingCard(1014);
 $builder->addPendingCard(1013);
 $builder->colonizePlanet(1012); // turn 3
-$builder->mineCrystal(1011, 1, 'blue', 'small'); // turn 2
+$builder->minePlanet(1011, 1); // turn 2
 $builder->buyTransport(1010, 2); // turn 1
 
 // Other
+$world = new \StarLord\Domain\Model\Galaxy([]);
+$world->savePlanet($homeWorld_playerOne_blue = new PlanetId(500), ColoredPlanet::blue());
+$world->savePlanet($homeWorld_playerTwo_green = new PlanetId(501), ColoredPlanet::green());
+$world->savePlanet($planet_purple = new PlanetId(502), ColoredPlanet::purple());
+$world->savePlanet($planet_red = new PlanetId(503), ColoredPlanet::red());
+$world->savePlanet($homeWorld_playerThree_yellow = new PlanetId(504), ColoredPlanet::yellow());
+
 $armadas = new \StarLord\Infrastructure\Persistence\InMemory\ShipCollection(
         [
-                new TestShip($playerOne_transport1 = new ShipId(400), $planet_1 = new PlanetId(500), 3),
+                new TestShip($playerOne_transport1 = new ShipId(400), $homeWorld_playerOne_blue, 3),
         ]
 );
 $players = new \StarLord\Infrastructure\Persistence\InMemory\PlayerCollection();
-$world = new \StarLord\Domain\Model\Galaxy([]);
-$world->savePlanet($planet_blue = new PlanetId(1), \StarLord\Domain\Model\ColoredPlanet::blue());
-$world->savePlanet($planet_green = new PlanetId(2), \StarLord\Domain\Model\ColoredPlanet::green());
-$world->savePlanet($planet_purple = new PlanetId(3), \StarLord\Domain\Model\ColoredPlanet::purple());
-$world->savePlanet($planet_red = new PlanetId(4), \StarLord\Domain\Model\ColoredPlanet::red());
-$world->savePlanet($planet_yellow = new PlanetId(5), \StarLord\Domain\Model\ColoredPlanet::yellow());
 
 $deck = $builder->createDeck();
+$cardRegistry = $builder->createRegistry();
 $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
 //    [
 //        $a_moveShip = new \StarLord\Domain\Model\Actions\MoveShipAction(),
@@ -131,18 +136,15 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
 // Handlers
 {
     $gameSetupHandler = new \StarLord\Domain\Model\Setup\GameSetup($publisher);
-    $playCardHandler = new \StarLord\Domain\Model\Commands\PlayCardHandler($players, $publisher);
+    $playCardHandler = new \StarLord\Domain\Model\Commands\PlayCardHandler($players, $cardRegistry, $publisher);
 //    $loadColonistsHandler = new LoadColonistsHandler();
-    $endTurnHandler = new \StarLord\Domain\Model\Commands\EndTurnHandler(
-            $players,
-            new \StarLord\Domain\Model\InProgressGame(),
-            $publisher
-    );
+    $endTurnHandler = new \StarLord\Domain\Model\Commands\EndTurnHandler($players, new \StarLord\Domain\Model\InProgressGame(), $publisher);
 //    $performActionHandler = new \StarLord\Domain\Model\Commands\PerformActionHandlerTest($players, $actions, $publisher);
     $moveShipHandler = new \StarLord\Domain\Model\Commands\MoveShipHandler($players, $armadas, $world, $publisher);
     $loadColonsHandler = new \StarLord\Domain\Model\Commands\LoadColonsHandler($players, $armadas, $publisher);
     $unloadColonsHandler = new \StarLord\Domain\Model\Commands\UnloadColonsHandler($world, $armadas, $publisher);
     $endPlayerTurnHandler = new \StarLord\Domain\Model\Commands\EndPlayerTurnHandler($players, $publisher);
+    $minePlanetHandler = new \StarLord\Domain\Model\Commands\MinePlanetHandler($players, $world, $publisher);
 }
 
 // Listeners
@@ -194,7 +196,9 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 
     $playCardHandler(new PlayCard($playerOne, 1010)); // Buy 2 transport for 1 CRD
     $playCardHandler(new PlayCard($playerTwo, 1005)); // Buy Colonists for 2CRD
-    $playCardHandler(new PlayCard($playerThree, 1000)); // Mine Yellow Crystal for 5 CRD
+    $playCardHandler(new PlayCard($playerThree, 1000)); // Mine Yellow Crystal (on starting planet) for 5 CRD
+    $minePlanetHandler(new MinePlanet($playerThree, $homeWorld_playerThree_yellow));
+    $endPlayerTurnHandler(new EndPlayerTurn($playerThree));
 
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
@@ -202,7 +206,7 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 }
 
 { echo "Turn 2\n";
-    $endTurnHandler(new EndTurn());
+//    $endTurnHandler(new EndTurn());
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
     dumpPlayer($playerThree, $players);
@@ -217,7 +221,7 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 }
 
 { echo "Turn 3\n";
-    $endTurnHandler(new EndTurn());
+//    $endTurnHandler(new EndTurn());
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
     dumpPlayer($playerThree, $players);
@@ -225,7 +229,7 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 // todo colonize, draw cards at start of turn, move colons to planet
     $playCardHandler(new PlayCard($playerOne, 1012)); // Colonize planet
     $loadColonsHandler(new LoadColons($playerOne, 2, $playerOne_transport1));
-    $moveShipHandler(new MoveShip($playerOne, $playerOne_transport1, $planet_blue));
+    $moveShipHandler(new MoveShip($playerOne, $playerOne_transport1, $hoplanetOne_homeworld_blue));
     $unloadColonsHandler(new UnloadColons($playerOne, $playerOne_transport1, 2));
     $endPlayerTurnHandler(new EndPlayerTurn($playerOne));
 
