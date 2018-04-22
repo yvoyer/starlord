@@ -4,12 +4,13 @@ Example game
 <?php
 
 use StarLord\Domain\Model\ColoredPlanet;
+use StarLord\Domain\Model\Commands\ColonizePlanet;
 use StarLord\Domain\Model\Commands\EndPlayerTurn;
-use StarLord\Domain\Model\Commands\EndTurn;
 use StarLord\Domain\Model\Commands\LoadColons;
 use StarLord\Domain\Model\Commands\MinePlanet;
 use StarLord\Domain\Model\Commands\MoveShip;
 use StarLord\Domain\Model\Commands\PlayCard;
+use StarLord\Domain\Model\Commands\SelectHomeWorld;
 use StarLord\Domain\Model\Commands\StartGame;
 use StarLord\Domain\Model\Commands\UnloadColons;
 use StarLord\Domain\Model\GameSettings;
@@ -134,24 +135,19 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
 //    ]
 
 // Handlers
-{
-    $gameSetupHandler = new \StarLord\Domain\Model\Setup\GameSetup($publisher);
-    $playCardHandler = new \StarLord\Domain\Model\Commands\PlayCardHandler($players, $cardRegistry, $publisher);
-//    $loadColonistsHandler = new LoadColonistsHandler();
-    $endTurnHandler = new \StarLord\Domain\Model\Commands\EndTurnHandler($players, new \StarLord\Domain\Model\InProgressGame(), $publisher);
-//    $performActionHandler = new \StarLord\Domain\Model\Commands\PerformActionHandlerTest($players, $actions, $publisher);
-    $moveShipHandler = new \StarLord\Domain\Model\Commands\MoveShipHandler($players, $armadas, $world, $publisher);
-    $loadColonsHandler = new \StarLord\Domain\Model\Commands\LoadColonsHandler($players, $armadas, $publisher);
-    $unloadColonsHandler = new \StarLord\Domain\Model\Commands\UnloadColonsHandler($world, $armadas, $publisher);
-    $endPlayerTurnHandler = new \StarLord\Domain\Model\Commands\EndPlayerTurnHandler($players, $publisher);
-    $minePlanetHandler = new \StarLord\Domain\Model\Commands\MinePlanetHandler($players, $world, $publisher);
-}
+// todo $performActionHandler = new \StarLord\Domain\Model\Commands\PerformActionHandlerTest($players, $actions, $publisher);
 
 // Listeners
 {
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Bonus\CollectResourcesFromPlanets($world, $players));
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Setup\PlayerSetup($players));
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Commands\DrawCardHandler($players, $deck, GameSettings::STARTING_CARDS));
+    $publisher->addSubscriber(
+            new \StarLord\Domain\Model\Bonus\CollectResourcesFromPlanets($world, $players)
+    );
+    $publisher->addSubscriber(
+            new \StarLord\Domain\Model\Setup\PlayerSetup($players)
+    );
+    $publisher->addSubscriber(
+            new \StarLord\Domain\Model\Commands\DrawCardHandler($players, $deck, GameSettings::STARTING_CARDS)
+    );
     $publisher->addSubscriber(
         new \StarLord\Domain\Model\Setup\StartingSpaceships(
             $players,
@@ -160,11 +156,45 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
             GameSettings::STARTING_CRUISERS
         )
     );
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Setup\StartingCredit($players, GameSettings::STARTING_CREDIT));
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Setup\StartingDeuterium($players, GameSettings::STARTING_DEUTERIUM));
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Setup\StartingColons($players, GameSettings::STARTING_COLONS));
-    $publisher->addSubscriber(new \StarLord\Domain\Model\Bonus\CollectResourcesFromCrystals($players));
-    $publisher->addSubscriber($endTurnHandler);
+    $publisher->addSubscriber(
+            new \StarLord\Domain\Model\Setup\StartingCredit($players, GameSettings::STARTING_CREDIT)
+    );
+    $publisher->addSubscriber(
+            new \StarLord\Domain\Model\Setup\StartingDeuterium($players, GameSettings::STARTING_DEUTERIUM)
+    );
+    $publisher->addSubscriber(
+            new \StarLord\Domain\Model\Bonus\CollectResourcesFromCrystals($players)
+    );
+    $publisher->addSubscriber(
+            $endTurnHandler = new \StarLord\Domain\Model\Commands\EndTurnHandler($players, new \StarLord\Domain\Model\InProgressGame(), $publisher)
+    );
+    $publisher->addSubscriber(
+        $selectHomeWorldHandler = new \StarLord\Domain\Model\Commands\SelectHomeWorldHandler($players, $publisher)
+    );
+    $publisher->addSubscriber(
+        $playCardHandler = new \StarLord\Domain\Model\Commands\PlayCardHandler($players, $cardRegistry, $publisher) // todo replace with action instead
+    );
+    $publisher->addSubscriber(
+        $moveShipHandler = new \StarLord\Domain\Model\Commands\MoveShipHandler($players, $armadas, $world, $publisher)
+    );
+    $publisher->addSubscriber(
+        $loadColonsHandler = new \StarLord\Domain\Model\Commands\LoadColonsHandler($players, $armadas, $publisher)
+    );
+    $publisher->addSubscriber(
+        $unloadColonsHandler = new \StarLord\Domain\Model\Commands\UnloadColonsHandler($world, $armadas, $publisher)
+    );
+    $publisher->addSubscriber(
+        $endPlayerTurnHandler = new \StarLord\Domain\Model\Commands\EndPlayerTurnHandler($players, $publisher)
+    );
+    $publisher->addSubscriber(
+        $minePlanetHandler = new \StarLord\Domain\Model\Commands\MinePlanetHandler($players, $world, $publisher)
+    );
+    $publisher->addSubscriber(
+        $colonizePlanetHandler = new \StarLord\Domain\Model\Commands\ColonizePlanetHandler($world, GameSettings::STARTING_COLONS, $publisher)
+    );
+    $publisher->addSubscriber(
+            $gameSetupHandler = new \StarLord\Domain\Model\Commands\StartGameHandler($players, $publisher)
+    );
 }
 
 function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $players) {
@@ -189,13 +219,18 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 }
 
 { echo "Start of game\n";
+// todo create game here.
+    $selectHomeWorldHandler(new SelectHomeWorld($playerOne, $homeWorld_playerOne_blue));
+    $selectHomeWorldHandler(new SelectHomeWorld($playerTwo, $homeWorld_playerTwo_green));
+    $selectHomeWorldHandler(new SelectHomeWorld($playerThree, $homeWorld_playerThree_yellow));
     $gameSetupHandler(new StartGame([$playerOne, $playerTwo, $playerThree]));
+
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
     dumpPlayer($playerThree, $players);
 
     $playCardHandler(new PlayCard($playerOne, 1010)); // Buy 2 transport for 1 CRD
-    $playCardHandler(new PlayCard($playerTwo, 1005)); // Buy Colonists for 2CRD
+    $playCardHandler(new PlayCard($playerTwo, 1005)); // Buy Colonists for 2CRD todo produced on start of turn maybe??
     $playCardHandler(new PlayCard($playerThree, 1000)); // Mine Yellow Crystal (on starting planet) for 5 CRD
     $minePlanetHandler(new MinePlanet($playerThree, $homeWorld_playerThree_yellow));
     $endPlayerTurnHandler(new EndPlayerTurn($playerThree));

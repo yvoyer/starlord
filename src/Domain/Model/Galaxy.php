@@ -18,7 +18,12 @@ final class Galaxy implements World
     public function __construct(array $planets)
     {
         Assert::allIsInstanceOf($planets, WriteOnlyPlanet::class);
-        $this->planets = $planets;
+        array_map(
+            function (int $key) use ($planets) {
+                $this->savePlanet(new PlanetId($key), $planets[$key]);
+            },
+            array_keys($planets)
+        );
     }
 
     /**

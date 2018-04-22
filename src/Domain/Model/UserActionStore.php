@@ -9,6 +9,7 @@ final class UserActionStore
 {
     const MOVE_SHIP = 'move-ship';
     const MINE_PLANET = 'mine-planet';
+    const SELECT_HOME_WORLD = 'select-home-world';
 
     private function __construct()
     {

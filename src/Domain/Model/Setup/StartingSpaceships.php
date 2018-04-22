@@ -44,7 +44,7 @@ final class StartingSpaceships
         $this->defaultFighters = $defaultFighters;
         $this->defaultCruisers = $defaultCruisers;
     }
-
+// todo use HomeWorldWasSelected
     /**
      * @param PlayerJoinedGame $event
      */
