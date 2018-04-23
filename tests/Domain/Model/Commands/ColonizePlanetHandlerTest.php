@@ -5,6 +5,7 @@ namespace StarLord\Domain\Model\Commands;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\HomeWorldWasSelected;
+use StarLord\Domain\Events\PlanetWasColonized;
 use StarLord\Domain\Model\Colons;
 use StarLord\Domain\Model\ColoredPlanet;
 use StarLord\Domain\Model\Galaxy;

@@ -188,6 +188,10 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         }
 
         unset($this->remainingActions[$key]);
+
+        if ($this->actionsAreCompleted()) {
+            $this->endTurn();
+        }
     }
 
     public function endTurn()

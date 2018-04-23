@@ -48,7 +48,13 @@ final class HomeWorldWasSelected implements StarLordEvent
      */
     public function serialize()
     {
-        throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
+        return json_encode(
+            [
+                'name' => 'home_world_selected',
+                'player' => $this->playerId->toString(),
+                'planet' => $this->planetId->toString(),
+            ]
+        );
     }
 
     /**

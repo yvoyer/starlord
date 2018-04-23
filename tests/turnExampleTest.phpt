@@ -5,6 +5,7 @@ Example game
 
 use StarLord\Domain\Model\ColoredPlanet;
 use StarLord\Domain\Model\Commands\ColonizePlanet;
+use StarLord\Domain\Model\Commands\CreateGame;
 use StarLord\Domain\Model\Commands\EndPlayerTurn;
 use StarLord\Domain\Model\Commands\LoadColons;
 use StarLord\Domain\Model\Commands\MinePlanet;
@@ -46,7 +47,8 @@ $publisher = new class() implements \StarLord\Domain\Model\Publisher {
         foreach ($this->subscribers as $subscriber) {
             if (method_exists($subscriber, $method)) {
                 $data = $event->serialize();
-                $this->logger->log("Publish event: '{$data}'.\n");
+                $subscriberClass = substr(get_class($subscriber), strrpos(get_class($subscriber), '\\') + 1);
+                $this->logger->log("Publish event: '{$data}' for '{$subscriberClass}'.\n");
                 $subscriber->{$method}($event);
 //            } else {
 //                $listener = get_class($subscriber);
@@ -140,13 +142,16 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
 // Listeners
 {
     $publisher->addSubscriber(
-            new \StarLord\Domain\Model\Bonus\CollectResourcesFromPlanets($world, $players)
+        $createGameHandler = new \StarLord\Domain\Model\Commands\CreateGameHandler($publisher)
     );
     $publisher->addSubscriber(
-            new \StarLord\Domain\Model\Setup\PlayerSetup($players)
+        new \StarLord\Domain\Model\Bonus\CollectResourcesFromPlanets($world, $players)
     );
     $publisher->addSubscriber(
-            new \StarLord\Domain\Model\Commands\DrawCardHandler($players, $deck, GameSettings::STARTING_CARDS)
+        new \StarLord\Domain\Model\Setup\PlayerSetup($players, $publisher)
+    );
+    $publisher->addSubscriber(
+        new \StarLord\Domain\Model\Commands\DrawCardHandler($players, $deck, GameSettings::STARTING_CARDS)
     );
     $publisher->addSubscriber(
         new \StarLord\Domain\Model\Setup\StartingSpaceships(
@@ -157,16 +162,16 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
         )
     );
     $publisher->addSubscriber(
-            new \StarLord\Domain\Model\Setup\StartingCredit($players, GameSettings::STARTING_CREDIT)
+        new \StarLord\Domain\Model\Setup\StartingCredit($players, GameSettings::STARTING_CREDIT)
     );
     $publisher->addSubscriber(
-            new \StarLord\Domain\Model\Setup\StartingDeuterium($players, GameSettings::STARTING_DEUTERIUM)
+        new \StarLord\Domain\Model\Setup\StartingDeuterium($players, GameSettings::STARTING_DEUTERIUM)
     );
     $publisher->addSubscriber(
-            new \StarLord\Domain\Model\Bonus\CollectResourcesFromCrystals($players)
+        new \StarLord\Domain\Model\Bonus\CollectResourcesFromCrystals($players)
     );
     $publisher->addSubscriber(
-            $endTurnHandler = new \StarLord\Domain\Model\Commands\EndTurnHandler($players, new \StarLord\Domain\Model\InProgressGame(), $publisher)
+        $endTurnHandler = new \StarLord\Domain\Model\Commands\EndTurnHandler($players, new \StarLord\Domain\Model\InProgressGame(), $publisher)
     );
     $publisher->addSubscriber(
         $selectHomeWorldHandler = new \StarLord\Domain\Model\Commands\SelectHomeWorldHandler($players, $publisher)
@@ -193,7 +198,10 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
         $colonizePlanetHandler = new \StarLord\Domain\Model\Commands\ColonizePlanetHandler($world, GameSettings::STARTING_COLONS, $publisher)
     );
     $publisher->addSubscriber(
-            $gameSetupHandler = new \StarLord\Domain\Model\Commands\StartGameHandler($players, $publisher)
+        $gameSetupHandler = new \StarLord\Domain\Model\Commands\StartGameHandler($players, $publisher)
+    );
+    $publisher->addSubscriber(
+        $startTurnHandler = new \StarLord\Domain\Model\Commands\StartPlayerTurnHandler($players, $publisher)
     );
 }
 
@@ -219,11 +227,11 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 }
 
 { echo "Start of game\n";
-// todo create game here.
+    $createGameHandler(new CreateGame([$playerOne, $playerTwo, $playerThree]));
     $selectHomeWorldHandler(new SelectHomeWorld($playerOne, $homeWorld_playerOne_blue));
     $selectHomeWorldHandler(new SelectHomeWorld($playerTwo, $homeWorld_playerTwo_green));
     $selectHomeWorldHandler(new SelectHomeWorld($playerThree, $homeWorld_playerThree_yellow));
-    $gameSetupHandler(new StartGame([$playerOne, $playerTwo, $playerThree]));
+    $gameSetupHandler(new StartGame());
 
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
@@ -283,24 +291,22 @@ echo "End of game\n";
 ?>
 --EXPECTF--
 Start of game
-Publish event: '{"name":"player_joined_game","player":"100"}'.
-Publish event: '{"name":"player_joined_game","player":"100"}'.
-Publish event: '{"name":"player_joined_game","player":"100"}'.
-Publish event: '{"name":"player_joined_game","player":"100"}'.
-Publish event: '{"name":"player_joined_game","player":"100"}'.
-Publish event: '{"name":"player_joined_game","player":"100"}'.
-Publish event: '{"name":"player_joined_game","player":"200"}'.
-Publish event: '{"name":"player_joined_game","player":"200"}'.
-Publish event: '{"name":"player_joined_game","player":"200"}'.
-Publish event: '{"name":"player_joined_game","player":"200"}'.
-Publish event: '{"name":"player_joined_game","player":"200"}'.
-Publish event: '{"name":"player_joined_game","player":"200"}'.
-Publish event: '{"name":"player_joined_game","player":"300"}'.
-Publish event: '{"name":"player_joined_game","player":"300"}'.
-Publish event: '{"name":"player_joined_game","player":"300"}'.
-Publish event: '{"name":"player_joined_game","player":"300"}'.
-Publish event: '{"name":"player_joined_game","player":"300"}'.
-Publish event: '{"name":"player_joined_game","player":"300"}'.
+Publish event: '{"name":"game_created","players":[100,200,300]}' for 'PlayerSetup'.
+Publish event: '{"name":"player_joined_game","player":"100"}' for 'DrawCardHandler'.
+Publish event: '{"name":"player_joined_game","player":"100"}' for 'StartingSpaceships'.
+Publish event: '{"name":"player_joined_game","player":"100"}' for 'StartingCredit'.
+Publish event: '{"name":"player_joined_game","player":"100"}' for 'StartingDeuterium'.
+Publish event: '{"name":"player_joined_game","player":"200"}' for 'DrawCardHandler'.
+Publish event: '{"name":"player_joined_game","player":"200"}' for 'StartingSpaceships'.
+Publish event: '{"name":"player_joined_game","player":"200"}' for 'StartingCredit'.
+Publish event: '{"name":"player_joined_game","player":"200"}' for 'StartingDeuterium'.
+Publish event: '{"name":"player_joined_game","player":"300"}' for 'DrawCardHandler'.
+Publish event: '{"name":"player_joined_game","player":"300"}' for 'StartingSpaceships'.
+Publish event: '{"name":"player_joined_game","player":"300"}' for 'StartingCredit'.
+Publish event: '{"name":"player_joined_game","player":"300"}' for 'StartingDeuterium'.
+Publish event: '{"name":"home-world-selected","player":"100","planet":"500"}' for 'ColonizePlanetHandler'.
+Publish event: '{"name":"home-world-selected","player":"200","planet":"501"}' for 'ColonizePlanetHandler'.
+Publish event: '{"name":"home-world-selected","player":"300","planet":"504"}' for 'ColonizePlanetHandler'.
 {"id":100,"population":1,"hand":[1010,1011,1012,1013,1014],"credit":10,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
 {"id":200,"population":1,"hand":[1005,1006,1007,1008,1009],"credit":10,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
 {"id":300,"population":1,"hand":[1000,1001,1002,1003,1004],"credit":10,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}

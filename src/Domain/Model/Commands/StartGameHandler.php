@@ -3,7 +3,6 @@
 namespace StarLord\Domain\Model\Commands;
 
 use StarLord\Domain\Events\GameWasStarted;
-use StarLord\Domain\Events\PlayerJoinedGame;
 use StarLord\Domain\Model\Exception\NotCompletedActionException;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\ReadOnlyPlayers;
@@ -35,10 +34,6 @@ final class StartGameHandler
      */
     public function __invoke(StartGame $command)
     {
-        foreach ($command->players() as $player) {
-            $this->publisher->publish(new PlayerJoinedGame($player));
-        }
-
         if (! $this->players->allPlayersOfGameHavePlayed()) {
             throw new NotCompletedActionException(
                 'Game cannot be started when some players have not completed their actions.'

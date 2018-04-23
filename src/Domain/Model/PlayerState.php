@@ -10,6 +10,7 @@ final class PlayerState extends StateMetadata
     const T_START_ACTION = 'start-action';
     const T_PERFORM_ACTION = 'perform-action';
     const T_END_TURN = 'end-turn';
+    const T_START_TURN = 'start-turn';
 
     const A_PLAYING = 'playing';
 
@@ -54,9 +55,14 @@ final class PlayerState extends StateMetadata
         return $this->transit(self::T_PERFORM_ACTION, 'player');
     }
 
-    public function endTurn()
+    public function endTurn(): self
     {
         return $this->transit(self::T_END_TURN, 'player');
+    }
+
+    public function startTurn(): self
+    {
+        return $this->transit(self::T_START_TURN, 'player');
     }
 
     /**
@@ -64,17 +70,17 @@ final class PlayerState extends StateMetadata
      *
      * @param StateBuilder $builder
      *
-     * +-------------------------------------------------+
-     * |                   Transitions                   |
-     * +-----------+---------+----------------+----------+
-     * | From / to | waiting | selecting      | done     |
-     * |=================================================|
-     * | waiting   |   N/A   | start-action   | N/A      |
-     * +-----------+---------+----------------+----------+
-     * | selecting |   N/A   | perform-action | end-turn |
-     * +-----------+---------+----------------+----------+
-     * | done      |   N/A   |     N/A        | N/A      |
-     * +-----------+---------+----------------+----------+
+     * +----------------------------------------------------+
+     * |                    Transitions                     |
+     * +-----------+------------+----------------+----------+
+     * | From / to |   waiting  | selecting      | done     |
+     * |====================================================|
+     * | waiting   |     N/A    | start-action   | N/A      |
+     * +-----------+------------+----------------+----------+
+     * | selecting |     N/A    | perform-action | end-turn |
+     * +-----------+------------+----------------+----------+
+     * | done      | start-turn |     N/A        | N/A      |
+     * +-----------+------------+----------------+----------+
      *
      * +---------------------------+
      * |         Attributes        |
@@ -93,6 +99,7 @@ final class PlayerState extends StateMetadata
         $builder->allowTransition(self::T_START_ACTION, self::S_WAITING, self::S_SELECTING);
         $builder->allowTransition(self::T_PERFORM_ACTION, self::S_SELECTING, self::S_SELECTING);
         $builder->allowTransition(self::T_END_TURN, self::S_SELECTING, self::S_DONE);
+        $builder->allowTransition(self::T_START_TURN, self::S_DONE, self::S_WAITING);
         $builder->addAttribute(self::A_PLAYING, [self::S_SELECTING]);
     }
 }
