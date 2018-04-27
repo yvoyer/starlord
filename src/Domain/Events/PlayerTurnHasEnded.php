@@ -28,24 +28,20 @@ final class PlayerTurnHasEnded implements StarLordEvent
     }
 
     /**
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
-     * @since 5.1.0
+     * @return string
      */
     public function serialize()
     {
-        throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
+        return json_encode(
+            [
+                'name' => 'player_turn_ended',
+                'player' => $this->playerId->toString(),
+            ]
+        );
     }
 
     /**
-     * Constructs the object
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
-     * @since 5.1.0
+     * @param string $serialized
      */
     public function unserialize($serialized)
     {

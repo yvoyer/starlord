@@ -56,7 +56,7 @@ final class MinePlanetHandlerTest extends TestCase
     {
         $this->world = new Galaxy([]);
         $this->world->savePlanet($this->planetId = new PlanetId(10), $this->planet = ColoredPlanet::yellow());
-        $this->player = TestPlayer::fromInt(1);
+        $this->player = TestPlayer::playingPlayer(1);
         $this->player->startAction([UserActionStore::MINE_PLANET]);
 
         $this->handler = new MinePlanetHandler(
@@ -81,7 +81,7 @@ final class MinePlanetHandlerTest extends TestCase
 
     public function test_it_not_allow_to_mine_a_planet_you_do_not_own()
     {
-        $other = TestPlayer::fromInt(99);
+        $other = TestPlayer::playingPlayer(99);
         $other->startAction([UserActionStore::MINE_PLANET]);
         $this->players->savePlayer($other->getIdentity(), $other);
         $this->assertPlanetIsColonized();

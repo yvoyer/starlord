@@ -3,14 +3,13 @@
 namespace StarLord\Domain\Model\Commands;
 
 use StarLord\Domain\Events\GameWasStarted;
-use StarLord\Domain\Model\Exception\NotCompletedActionException;
 use StarLord\Domain\Model\Publisher;
-use StarLord\Domain\Model\ReadOnlyPlayers;
+use StarLord\Domain\Model\WriteOnlyPlayers;
 
 final class StartGameHandler
 {
     /**
-     * @var ReadOnlyPlayers
+     * @var WriteOnlyPlayers
      */
     private $players;
 
@@ -20,10 +19,10 @@ final class StartGameHandler
     private $publisher;
 
     /**
-     * @param ReadOnlyPlayers $players
+     * @param WriteOnlyPlayers $players
      * @param Publisher $publisher
      */
-    public function __construct(ReadOnlyPlayers $players, Publisher $publisher)
+    public function __construct(WriteOnlyPlayers $players, Publisher $publisher)
     {
         $this->players = $players;
         $this->publisher = $publisher;
@@ -34,12 +33,13 @@ final class StartGameHandler
      */
     public function __invoke(StartGame $command)
     {
-        if (! $this->players->allPlayersOfGameHavePlayed()) {
-            throw new NotCompletedActionException(
-                'Game cannot be started when some players have not completed their actions.'
-            );
+        foreach ($command->players() as $playerId) {
+            $player = $this->players->getPlayerWithId($playerId);
+            $player->startGame();
+
+            $this->players->savePlayer($playerId, $player);
         }
 
-        $this->publisher->publish(new GameWasStarted());
+        $this->publisher->publish(new GameWasStarted($command->players()));
     }
 }

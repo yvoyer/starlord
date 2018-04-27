@@ -59,7 +59,7 @@ final class UnloadColonsHandlerTest extends TestCase
         $this->world = new Galaxy([]);
         $this->world->savePlanet(new PlanetId(3), $this->planet = ColoredPlanet::yellow());
 
-        $this->player = TestPlayer::fromInt(5);
+        $this->player = TestPlayer::playingPlayer(5);
         $this->handler = new UnloadColonsHandler(
             $this->world,
             $this->armada = new ShipCollection([$this->ship]),

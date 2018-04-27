@@ -42,18 +42,31 @@ final class StartGameHandlerTest extends TestCase
             ->method('publish')
             ->with($this->isInstanceOf(GameWasStarted::class));
 
-        $this->handler->__invoke(new StartGame());
+        $this->handler->__invoke(new StartGame([]));
     }
 
     public function test_it_should_throw_exception_when_one_player_has_uncompleted_actions()
     {
-        $player = TestPlayer::fromInt(1);
+        $player = TestPlayer::playingPlayer(1);
         $player->startAction(['action']);
         $this->players->savePlayer($player->getIdentity(), $player);
         $this->assertFalse($this->players->allPlayersOfGameHavePlayed());
 
         $this->expectException(NotCompletedActionException::class);
-        $this->expectExceptionMessage('Game cannot be started when some players have not completed their actions.');
-        $this->handler->__invoke(new StartGame());
+        $this->expectExceptionMessage(
+            'Game cannot be started when player have some not completed actions "["action"]".'
+        );
+        $this->handler->__invoke(new StartGame([$player->getIdentity()]));
+    }
+
+    public function test_it_should_start_turn_of_players_when_invoked()
+    {
+        $player = TestPlayer::fromInt(1);
+        $this->players->savePlayer($player->getIdentity(), $player);
+        $this->assertFalse($player->isActive());
+
+        $this->handler->__invoke(new StartGame([$player->getIdentity()]));
+
+        $this->assertTrue($player->isActive());
     }
 }

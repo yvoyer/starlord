@@ -21,20 +21,35 @@ final class StartPlayerTurnHandler
         $this->players = $players;
     }
 
+    /**
+     * @param StartPlayerTurn $command
+     */
     public function __invoke(StartPlayerTurn $command)
     {
         $player = $this->players->getPlayerWithId($command->playerId());
-        $player->endTurn();
+        $player->startTurn();
 
         $this->players->savePlayer($command->playerId(), $player);
-//       new TurnWasStarted()
-        throw new \RuntimeException('Method ' . __METHOD__ . ' not implemented yet.');
     }
 
-    public function onGameWasStarted(GameWasStarted $event)
+//    /**
+//     * @param GameWasStarted $event
+//     */
+//    public function onGameWasStarted(GameWasStarted $event)
+//    {
+//        foreach ($event->players() as $playerId) {
+//            $this->__invoke(new StartPlayerTurn($playerId));
+//        }
+//    }
+
+    /**
+     * @param TurnWasStarted $event
+     */
+    public function onTurnWasStarted(TurnWasStarted $event)
     {
-        foreach ($event->players() as $playerId) {
-            $this->__invoke(new StartPlayerTurn($playerId));
+        $players = $this->players->playersOfGame();
+        foreach ($players as $player) {
+            $this->__invoke(new StartPlayerTurn($player->getIdentity()));
         }
     }
 }

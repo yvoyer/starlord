@@ -154,14 +154,14 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     /**
      * @return bool
      */
-    public function isPlaying(): bool
+    public function isActive(): bool
     {
-        return $this->state->isPlaying();
+        return $this->state->isActive();
     }
 
-    public function hasPlayed(): bool
+    public function turnIsDone(): bool
     {
-        return $this->state->hasPlayed();
+        return $this->state->turnIsDone();
     }
 
     public function startAction(array $requiredActions = [])
@@ -189,14 +189,32 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 
         unset($this->remainingActions[$key]);
 
-        if ($this->actionsAreCompleted()) {
+        if (! $this->remainingActions()) {
             $this->endTurn();
         }
     }
 
+    public function startGame()
+    {
+        if ($this->remainingActions()) {
+            throw new NotCompletedActionException(
+                sprintf(
+                    'Game cannot be started when player have some not completed actions "%s".',
+                    json_encode($this->remainingActions)
+                )
+            );
+        }
+
+        $this->state = $this->state->startGame();
+    }
+
+    public function startTurn()
+    {
+        $this->state = $this->state->startTurn();
+    }
+
     public function endTurn()
     {
-        $this->state = $this->state->endTurn();
         if (! $this->actionsAreCompleted()) {
             throw new NotCompletedActionException(
                 sprintf(
@@ -205,6 +223,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
                 )
             );
         }
+        $this->state = $this->state->endTurn();
     }
 
     /**
@@ -445,5 +464,18 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     public static function fromInt(int $playerId): self
     {
         return new self(new PlayerId($playerId));
+    }
+
+    /**
+     * @param int $playerId
+     *
+     * @return TestPlayer
+     */
+    public static function playingPlayer(int $playerId): self
+    {
+        $player = self::fromInt($playerId);
+        $player->startGame();
+
+        return $player;
     }
 }

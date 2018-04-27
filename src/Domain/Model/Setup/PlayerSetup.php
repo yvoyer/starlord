@@ -40,7 +40,7 @@ final class PlayerSetup
             if ($this->players->playerExists($playerId)) {
                 throw new \InvalidArgumentException("Player with id '{$playerId->toString()}' already exists.");
             }
-            $player = TestPlayer::fromInt($playerId->toInt());
+            $player = TestPlayer::playingPlayer($playerId->toInt());
             $player->startAction([UserActionStore::SELECT_HOME_WORLD]);
             $this->players->savePlayer($playerId, $player);
 

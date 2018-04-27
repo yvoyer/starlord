@@ -14,7 +14,7 @@ final class ColoredPlanetTest extends TestCase
 
     public function setUp()
     {
-        $this->player = TestPlayer::fromInt(1);
+        $this->player = TestPlayer::playingPlayer(1);
     }
 
     public function test_it_should_colonize_the_planet()

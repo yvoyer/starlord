@@ -198,10 +198,10 @@ $actions = new \StarLord\Infrastructure\Persistence\InMemory\ActionRegistry([]);
         $colonizePlanetHandler = new \StarLord\Domain\Model\Commands\ColonizePlanetHandler($world, GameSettings::STARTING_COLONS, $publisher)
     );
     $publisher->addSubscriber(
-        $gameSetupHandler = new \StarLord\Domain\Model\Commands\StartGameHandler($players, $publisher)
+        $startGameHandler = new \StarLord\Domain\Model\Commands\StartGameHandler($players, $publisher)
     );
     $publisher->addSubscriber(
-        $startTurnHandler = new \StarLord\Domain\Model\Commands\StartPlayerTurnHandler($players, $publisher)
+        $startTurnHandler = new \StarLord\Domain\Model\Commands\StartPlayerTurnHandler($players)
     );
 }
 
@@ -228,10 +228,15 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 
 { echo "Start of game\n";
     $createGameHandler(new CreateGame([$playerOne, $playerTwo, $playerThree]));
+
     $selectHomeWorldHandler(new SelectHomeWorld($playerOne, $homeWorld_playerOne_blue));
+   // $endPlayerTurnHandler(new EndPlayerTurn($playerOne));
     $selectHomeWorldHandler(new SelectHomeWorld($playerTwo, $homeWorld_playerTwo_green));
+   // $endPlayerTurnHandler(new EndPlayerTurn($playerTwo));
     $selectHomeWorldHandler(new SelectHomeWorld($playerThree, $homeWorld_playerThree_yellow));
-    $gameSetupHandler(new StartGame());
+ //   $endPlayerTurnHandler(new EndPlayerTurn($playerThree));
+
+    $startGameHandler(new StartGame([$playerOne, $playerTwo, $playerThree]));
 
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
@@ -241,7 +246,9 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
     $playCardHandler(new PlayCard($playerTwo, 1005)); // Buy Colonists for 2CRD todo produced on start of turn maybe??
     $playCardHandler(new PlayCard($playerThree, 1000)); // Mine Yellow Crystal (on starting planet) for 5 CRD
     $minePlanetHandler(new MinePlanet($playerThree, $homeWorld_playerThree_yellow));
-    $endPlayerTurnHandler(new EndPlayerTurn($playerThree));
+   // $endPlayerTurnHandler(new EndPlayerTurn($playerOne));
+   // $endPlayerTurnHandler(new EndPlayerTurn($playerTwo));
+//    $endPlayerTurnHandler(new EndPlayerTurn($playerThree));
 
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
@@ -249,7 +256,6 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 }
 
 { echo "Turn 2\n";
-//    $endTurnHandler(new EndTurn());
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
     dumpPlayer($playerThree, $players);
@@ -264,7 +270,6 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
 }
 
 { echo "Turn 3\n";
-//    $endTurnHandler(new EndTurn());
     dumpPlayer($playerOne, $players);
     dumpPlayer($playerTwo, $players);
     dumpPlayer($playerThree, $players);
@@ -286,6 +291,33 @@ function dumpPlayer(PlayerId $id, \StarLord\Domain\Model\WriteOnlyPlayers $playe
     dumpPlayer($playerTwo, $players);
     dumpPlayer($playerThree, $players);
 }
+//Turn 2
+//Publish event: '{"name":"turn_was_started"}' for 'CollectResourcesFromPlanets'.
+//Publish event: '{"name":"turn_was_started"}' for 'CollectResourcesFromCrystals'.
+//{"id":100,"population":1,"hand":[1011,1012,1013,1014,1015],"credit":8,"deuterium":5,"transports":4,"fighters":1,"cruisers":0,"crystals":[]}
+//{"id":200,"population":2,"hand":[1006,1007,1008,1009,1016],"credit":8,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
+//{"id":300,"population":1,"hand":[1001,1002,1003,1004,1017],"credit":6,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1}}}
+//Publish event: '{"name":"card_was_played","player_id":"100","card_id":1011}'.
+//Publish event: '{"name":"card_was_played","player_id":"200","card_id":1006}'.
+//Publish event: '{"name":"card_was_played","player_id":"300","card_id":1001}'.
+//{"id":100,"population":1,"hand":[1012,1013,1014,1015,1018],"credit":3,"deuterium":5,"transports":4,"fighters":1,"cruisers":0,"crystals":{"blue":{"small":1}}}
+//{"id":200,"population":2,"hand":[1007,1008,1009,1016,1019],"credit":3,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"purple":{"small":1}}}
+//{"id":300,"population":1,"hand":[1002,1003,1004,1017,1020],"credit":1,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1},"green":{"small":1}}}
+//Turn 3
+//Publish event: '{"name":"turn_was_started"}' for 'CollectResourcesFromPlanets'.
+//Publish event: '{"name":"turn_was_started"}' for 'CollectResourcesFromCrystals'.
+//{"id":100,"population":1,"hand":[1012,1013,1014,1015,1018],"credit":3,"deuterium":6,"transports":4,"fighters":1,"cruisers":0,"crystals":{"blue":{"small":1}}}
+//{"id":200,"population":2,"hand":[1007,1008,1009,1016,1019],"credit":3,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"purple":{"small":1}}}
+//{"id":300,"population":2,"hand":[1002,1003,1004,1017,1020],"credit":2,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1},"green":{"small":1}}}
+//Publish event: '{"name":"card_was_played","player_id":"100","card_id":1012}'.
+//// wait for player to choose ship to send and how many colonists
+//// wait for player to choose a planet to colonize
+//// postpone payment of deuterium when planet is chosen to pay for each sent ships
+//// when all players are in done mode end turn
+//// should switch all player to pending at start of turn
+//{"id":100,"population":1,"hand":[1013,1014,1015,1018,1021],"credit":1,"deuterium":4,"transports":4,"fighters":1,"cruisers":0,"crystals":{"blue":{"small":1}}}
+//{"id":200,"population":2,"hand":[1007,1008,1009,1016,1019],"credit":3,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"purple":{"small":1}}}
+//{"id":300,"population":2,"hand":[1002,1003,1004,1017,1020],"credit":2,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1},"green":{"small":1}}}
 
 echo "End of game\n";
 ?>
@@ -304,9 +336,15 @@ Publish event: '{"name":"player_joined_game","player":"300"}' for 'DrawCardHandl
 Publish event: '{"name":"player_joined_game","player":"300"}' for 'StartingSpaceships'.
 Publish event: '{"name":"player_joined_game","player":"300"}' for 'StartingCredit'.
 Publish event: '{"name":"player_joined_game","player":"300"}' for 'StartingDeuterium'.
-Publish event: '{"name":"home-world-selected","player":"100","planet":"500"}' for 'ColonizePlanetHandler'.
-Publish event: '{"name":"home-world-selected","player":"200","planet":"501"}' for 'ColonizePlanetHandler'.
-Publish event: '{"name":"home-world-selected","player":"300","planet":"504"}' for 'ColonizePlanetHandler'.
+Publish event: '{"name":"home_world_selected","player":"100","planet":"500"}' for 'ColonizePlanetHandler'.
+Publish event: '{"name":"player_turn_ended","player":"100"}' for 'EndTurnHandler'.
+Publish event: '{"name":"home_world_selected","player":"200","planet":"501"}' for 'ColonizePlanetHandler'.
+Publish event: '{"name":"player_turn_ended","player":"200"}' for 'EndTurnHandler'.
+Publish event: '{"name":"home_world_selected","player":"300","planet":"504"}' for 'ColonizePlanetHandler'.
+Publish event: '{"name":"player_turn_ended","player":"300"}' for 'EndTurnHandler'.
+Publish event: '{"name":"turn_was_started"}' for 'CollectResourcesFromPlanets'.
+Publish event: '{"name":"turn_was_started"}' for 'CollectResourcesFromCrystals'.
+Publish event: '{"name":"turn_was_started"}' for 'StartPlayerTurnHandler'.
 {"id":100,"population":1,"hand":[1010,1011,1012,1013,1014],"credit":10,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
 {"id":200,"population":1,"hand":[1005,1006,1007,1008,1009],"credit":10,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
 {"id":300,"population":1,"hand":[1000,1001,1002,1003,1004],"credit":10,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
@@ -316,31 +354,4 @@ Publish event: '{"name":"card_was_played","player_id":"300","card_id":1000}'.
 {"id":100,"population":1,"hand":[1011,1012,1013,1014,1015],"credit":8,"deuterium":5,"transports":4,"fighters":1,"cruisers":0,"crystals":[]}
 {"id":200,"population":2,"hand":[1006,1007,1008,1009,1016],"credit":8,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
 {"id":300,"population":1,"hand":[1001,1002,1003,1004,1017],"credit":5,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1}}}
-Turn 2
-Publish event: '{"name":"turn_was_started"}'.
-Publish event: '{"name":"turn_was_started"}'.
-{"id":100,"population":1,"hand":[1011,1012,1013,1014,1015],"credit":8,"deuterium":5,"transports":4,"fighters":1,"cruisers":0,"crystals":[]}
-{"id":200,"population":2,"hand":[1006,1007,1008,1009,1016],"credit":8,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":[]}
-{"id":300,"population":1,"hand":[1001,1002,1003,1004,1017],"credit":6,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1}}}
-Publish event: '{"name":"card_was_played","player_id":"100","card_id":1011}'.
-Publish event: '{"name":"card_was_played","player_id":"200","card_id":1006}'.
-Publish event: '{"name":"card_was_played","player_id":"300","card_id":1001}'.
-{"id":100,"population":1,"hand":[1012,1013,1014,1015,1018],"credit":3,"deuterium":5,"transports":4,"fighters":1,"cruisers":0,"crystals":{"blue":{"small":1}}}
-{"id":200,"population":2,"hand":[1007,1008,1009,1016,1019],"credit":3,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"purple":{"small":1}}}
-{"id":300,"population":1,"hand":[1002,1003,1004,1017,1020],"credit":1,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1},"green":{"small":1}}}
-Turn 3
-Publish event: '{"name":"turn_was_started"}'.
-Publish event: '{"name":"turn_was_started"}'.
-{"id":100,"population":1,"hand":[1012,1013,1014,1015,1018],"credit":3,"deuterium":6,"transports":4,"fighters":1,"cruisers":0,"crystals":{"blue":{"small":1}}}
-{"id":200,"population":2,"hand":[1007,1008,1009,1016,1019],"credit":3,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"purple":{"small":1}}}
-{"id":300,"population":2,"hand":[1002,1003,1004,1017,1020],"credit":2,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1},"green":{"small":1}}}
-Publish event: '{"name":"card_was_played","player_id":"100","card_id":1012}'.
-// wait for player to choose ship to send and how many colonists
-// wait for player to choose a planet to colonize
-// postpone payment of deuterium when planet is chosen to pay for each sent ships
-// when all players are in done mode end turn
-// should switch all player to pending at start of turn
-{"id":100,"population":1,"hand":[1013,1014,1015,1018,1021],"credit":1,"deuterium":4,"transports":4,"fighters":1,"cruisers":0,"crystals":{"blue":{"small":1}}}
-{"id":200,"population":2,"hand":[1007,1008,1009,1016,1019],"credit":3,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"purple":{"small":1}}}
-{"id":300,"population":2,"hand":[1002,1003,1004,1017,1020],"credit":2,"deuterium":5,"transports":2,"fighters":1,"cruisers":0,"crystals":{"yellow":{"small":1},"green":{"small":1}}}
 End of game

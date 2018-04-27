@@ -13,7 +13,7 @@ final class MinePlanetTest extends TestCase
 {
     public function test_it_should_cost_credit()
     {
-        $player = TestPlayer::fromInt(1);
+        $player = TestPlayer::playingPlayer(1);
         $player->addCredit(new Credit(10));
         $card = new MinePlanet(1);
         $player->drawCard(1, $card);
@@ -27,7 +27,7 @@ final class MinePlanetTest extends TestCase
 
     public function test_it_should_add_actions_when_played()
     {
-        $player = TestPlayer::fromInt(1);
+        $player = TestPlayer::playingPlayer(1);
         $player->addCredit(new Credit(10));
         $card = new MinePlanet(1);
         $player->drawCard(1, $card);

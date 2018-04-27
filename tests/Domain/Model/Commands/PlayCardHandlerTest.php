@@ -41,7 +41,7 @@ final class PlayCardHandlerTest extends TestCase
 
     public function setUp()
     {
-        $this->player = TestPlayer::fromInt(12);
+        $this->player = TestPlayer::playingPlayer(12);
         $this->players = new PlayerCollection([$this->player]);
         $this->publisher = $this->createMock(Publisher::class);
         $this->handler = new PlayCardHandler(

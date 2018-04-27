@@ -48,7 +48,7 @@ final class MoveShipHandlerTest extends TestCase
 
     public function setUp()
     {
-        $this->player = TestPlayer::fromInt(1);
+        $this->player = TestPlayer::playingPlayer(1);
         $this->player->startAction();
 
         $this->handler = new MoveShipHandler(

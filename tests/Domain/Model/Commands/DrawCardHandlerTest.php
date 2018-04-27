@@ -36,7 +36,7 @@ final class DrawCardHandlerTest extends TestCase
 
     public function setUp()
     {
-        $this->player = TestPlayer::fromInt(1);
+        $this->player = TestPlayer::playingPlayer(1);
         $this->handler = new DrawCardHandler(
             $this->players = new PlayerCollection(),
             $this->deck = new AlwaysReturnCard(10, $this->createMock(Card::class)),

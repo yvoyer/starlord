@@ -22,8 +22,8 @@ final class StartingCreditTest extends TestCase
 
     public function test_it_should_give_players_their_base_credit()
     {
-        $this->players->savePlayer(new PlayerId(1), $playerOne = TestPlayer::fromInt(1));
-        $this->players->savePlayer(new PlayerId(2), $playerTwo = TestPlayer::fromInt(2));
+        $this->players->savePlayer(new PlayerId(1), $playerOne = TestPlayer::playingPlayer(1));
+        $this->players->savePlayer(new PlayerId(2), $playerTwo = TestPlayer::playingPlayer(2));
 
         $this->assertSame(0, $playerOne->getCredit()->toInt());
         $this->assertSame(0, $playerTwo->getCredit()->toInt());

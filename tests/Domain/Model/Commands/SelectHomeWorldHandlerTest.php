@@ -31,7 +31,7 @@ final class SelectHomeWorldHandlerTest extends TestCase
     public function setUp()
     {
         $this->handler = new SelectHomeWorldHandler(
-            new PlayerCollection([$this->player = TestPlayer::fromInt(1)]),
+            new PlayerCollection([$this->player = TestPlayer::playingPlayer(1)]),
             $this->publisher = $this->createMock(Publisher::class)
         );
         $this->player->startAction([UserActionStore::SELECT_HOME_WORLD]);

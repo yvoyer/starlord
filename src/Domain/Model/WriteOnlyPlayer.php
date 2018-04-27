@@ -58,6 +58,10 @@ interface WriteOnlyPlayer extends ReadOnlyPlayer
      */
     public function loadColons(Colons $colons);
 
+    public function startGame();
+
+    public function startTurn();
+
     public function endTurn();
 
     /**

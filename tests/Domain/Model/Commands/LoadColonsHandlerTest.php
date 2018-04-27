@@ -46,7 +46,7 @@ final class LoadColonsHandlerTest extends TestCase
 
     public function setUp()
     {
-        $this->players = new PlayerCollection([$this->player = TestPlayer::fromInt(1)]);
+        $this->players = new PlayerCollection([$this->player = TestPlayer::playingPlayer(1)]);
         $this->armada = new ShipCollection([$this->ship = TestShip::transport(5, 10)]);
         $this->publisher = $this->createMock(Publisher::class);
         $this->handler = new LoadColonsHandler(

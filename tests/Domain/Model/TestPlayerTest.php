@@ -27,7 +27,7 @@ final class TestPlayerTest extends TestCase
     public function setUp()
     {
         $this->card = $this->createMock(Card::class);
-        $this->player = TestPlayer::fromInt(99);
+        $this->player = TestPlayer::playingPlayer(99);
     }
 
     public function test_it_should_have_a_number_of_crystal_at_home_world()
@@ -217,15 +217,6 @@ final class TestPlayerTest extends TestCase
         $this->assertSame(3, $this->player->getDeuterium()->toInt());
     }
 
-    public function test_it_should_put_the_player_in_stale_mode_on_colonize()
-    {
-        $this->assertFalse($this->player->isPlaying());
-
-        $this->player->startAction();
-
-        $this->assertTrue($this->player->isPlaying());
-    }
-
     public function test_it_should_not_allow_to_end_turn_when_required_actions_are_not_performed()
     {
         $this->player->startAction(['action']);
@@ -251,5 +242,16 @@ final class TestPlayerTest extends TestCase
         $this->expectException(PlayerActionException::class);
         $this->expectExceptionMessage('Cannot perform the action "action" when it is not required.');
         $this->player->performAction(new StringAction('action'));
+    }
+
+    public function test_it_should_not_allow_to_start_game_when_remaining_actions()
+    {
+        $this->player->startAction(['action']);
+
+        $this->expectException(NotCompletedActionException::class);
+        $this->expectExceptionMessage(
+            'Game cannot be started when player have some not completed actions "["action"]".'
+        );
+        $this->player->startGame();
     }
 }

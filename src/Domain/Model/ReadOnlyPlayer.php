@@ -42,12 +42,12 @@ interface ReadOnlyPlayer
     /**
      * @return bool
      */
-    public function isPlaying(): bool;
+    public function isActive(): bool;
 
     /**
      * @return bool
      */
-    public function hasPlayed(): bool;
+    public function turnIsDone(): bool;
 
     /**
      * @return Colons
