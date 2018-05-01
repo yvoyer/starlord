@@ -39,13 +39,13 @@ final class SelectHomeWorldHandlerTest extends TestCase
 
     public function test_it_should_perform_the_action()
     {
-        $this->assertEquals([UserActionStore::SELECT_HOME_WORLD], $this->player->remainingActions());
+        $this->assertEquals([UserActionStore::SELECT_HOME_WORLD], $this->player->actionsToPerform());
 
         $this->handler->__invoke(
             new SelectHomeWorld($this->player->getIdentity(), new PlanetId(9))
         );
 
-        $this->assertCount(0, $this->player->remainingActions());
+        $this->assertCount(0, $this->player->actionsToPerform());
     }
 
     public function test_it_should_publish_the_event()

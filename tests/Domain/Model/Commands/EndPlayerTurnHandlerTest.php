@@ -38,7 +38,7 @@ final class EndPlayerTurnHandlerTest extends TestCase
 
     public function test_it_should_end_the_player_turn_when_action_was_performed()
     {
-        $this->assertEmpty($this->player->remainingActions());
+        $this->assertEmpty($this->player->actionsToPerform());
         $this->assertTrue($this->player->isActive());
         $this->assertFalse($this->player->turnIsDone());
 
@@ -56,7 +56,7 @@ final class EndPlayerTurnHandlerTest extends TestCase
     {
         $this->player->startAction(['action']);
         $this->assertTrue($this->player->isActive());
-        $this->assertCount(1, $this->player->remainingActions());
+        $this->assertCount(1, $this->player->actionsToPerform());
         $this->handler->__invoke(new EndPlayerTurn(new PlayerId(1)));
     }
 

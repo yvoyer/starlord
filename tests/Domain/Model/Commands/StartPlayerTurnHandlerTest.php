@@ -3,7 +3,7 @@
 namespace StarLord\Domain\Model\Commands;
 
 use PHPUnit\Framework\TestCase;
-use StarLord\Domain\Events\GameWasStarted;
+use StarLord\Domain\Events\TurnWasStarted;
 use StarLord\Domain\Model\TestPlayer;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 
@@ -40,7 +40,7 @@ final class StartPlayerTurnHandlerTest extends TestCase
     {
         $this->assertFalse($this->player->isActive());
 
-        $this->handler->onGameWasStarted(new GameWasStarted([$this->player->getIdentity()]));
+        $this->handler->onTurnWasStarted(new TurnWasStarted());
 
         $this->assertTrue($this->player->isActive());
     }

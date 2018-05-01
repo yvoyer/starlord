@@ -26,4 +26,14 @@ final class StringAction implements UserAction
     {
         return $this->action;
     }
+
+    /**
+     * Whether the action needs to be performed
+     *
+     * @return bool
+     */
+    public function requiresPerform(): bool
+    {
+        return true;
+    }
 }

@@ -2,14 +2,14 @@
 
 namespace StarLord\Domain\Model;
 
-final class InProgressGame implements GameContext
+final class SettingUpGame implements GameContext
 {
     /**
      * @return bool
      */
     public function gameIsStarted(): bool
     {
-        return true;
+        return false;
     }
 
     /**

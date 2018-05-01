@@ -7,6 +7,8 @@ use Star\Component\Identity\Exception\EntityNotFoundException;
 use StarLord\Domain\Model\Bonus\Crystal;
 use StarLord\Domain\Model\Exception\NotCompletedActionException;
 use StarLord\Domain\Model\Exception\PlayerActionException;
+use StarLord\Domain\Model\State\PlayerStatus;
+use StarLord\Domain\Model\State\SetupPlayer;
 
 class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 {
@@ -66,7 +68,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     private $colons;
 
     /**
-     * @var PlayerState
+     * @var PlayerStatus
      */
     private $state;
 
@@ -88,7 +90,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         $this->armada = new Armada();
         $this->level = new MiningLevel();
         $this->baseAttack = new BaseAttack();
-        $this->state = new PlayerState();
+        $this->state = new SetupPlayer();
         $this->colons = new Colons(0);
     }
 
@@ -164,10 +166,15 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         return $this->state->turnIsDone();
     }
 
-    public function startAction(array $requiredActions = [])
+    /**
+     * @param GameContext $context
+     * @param string[] $requiredActions
+     */
+    public function startAction(GameContext $context, array $requiredActions = [])
     {
         Assertion::allString($requiredActions);
-        $this->state = $this->state->startAction();
+        $this->state = $this->state->startAction($context);
+
         $this->remainingActions = $requiredActions;
     }
 
@@ -176,9 +183,8 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
      */
     public function performAction(UserAction $action)
     {
-        $this->state = $this->state->performAction();
         $key = array_search($action->actionName(), $this->remainingActions);
-        if (false === $key) {
+        if (false === $key && $action->requiresPerform()) {
             throw new PlayerActionException(
                 sprintf(
                     'Cannot perform the action "%s" when it is not required.',
@@ -189,24 +195,26 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 
         unset($this->remainingActions[$key]);
 
-        if (! $this->remainingActions()) {
-            $this->endTurn();
-        }
+//        if ($this->actionsAreCompleted()) {
+            $this->state = $this->state->performAction($this);
+  //      } else {
+    //        $this->state = $this->state->continueAction();
+      //  }
     }
-
-    public function startGame()
-    {
-        if ($this->remainingActions()) {
-            throw new NotCompletedActionException(
-                sprintf(
-                    'Game cannot be started when player have some not completed actions "%s".',
-                    json_encode($this->remainingActions)
-                )
-            );
-        }
-
-        $this->state = $this->state->startGame();
-    }
+//
+//    public function startGame()
+//    {
+//        if (! $this->actionsAreCompleted()) {
+//            throw new NotCompletedActionException(
+//                sprintf(
+//                    'Game cannot be started when player have some not completed actions "%s".',
+//                    json_encode($this->remainingActions)
+//                )
+//            );
+//        }
+//
+//        $this->state = $this->state->startGame();
+//    }
 
     public function startTurn()
     {
@@ -229,7 +237,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     /**
      * @return bool
      */
-    private function actionsAreCompleted(): bool
+    public function actionsAreCompleted(): bool
     {
         return empty($this->remainingActions);
     }
@@ -245,7 +253,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     /**
      * @return string[]
      */
-    public function remainingActions(): array
+    public function actionsToPerform(): array
     {
         return $this->remainingActions;
     }
@@ -474,7 +482,7 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     public static function playingPlayer(int $playerId): self
     {
         $player = self::fromInt($playerId);
-        $player->startGame();
+        $player->startTurn();
 
         return $player;
     }

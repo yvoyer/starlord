@@ -2,7 +2,6 @@
 
 namespace StarLord\Domain\Model\Commands;
 
-use StarLord\Domain\Events\GameWasStarted;
 use StarLord\Domain\Events\TurnWasStarted;
 use StarLord\Domain\Model\WriteOnlyPlayers;
 
@@ -23,6 +22,7 @@ final class StartPlayerTurnHandler
 
     /**
      * @param StartPlayerTurn $command
+     * todo remove command trigger by events only???
      */
     public function __invoke(StartPlayerTurn $command)
     {
@@ -31,16 +31,6 @@ final class StartPlayerTurnHandler
 
         $this->players->savePlayer($command->playerId(), $player);
     }
-
-//    /**
-//     * @param GameWasStarted $event
-//     */
-//    public function onGameWasStarted(GameWasStarted $event)
-//    {
-//        foreach ($event->players() as $playerId) {
-//            $this->__invoke(new StartPlayerTurn($playerId));
-//        }
-//    }
 
     /**
      * @param TurnWasStarted $event

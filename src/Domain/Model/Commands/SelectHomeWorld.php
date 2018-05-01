@@ -52,4 +52,14 @@ final class SelectHomeWorld implements UserAction
     {
         return UserActionStore::SELECT_HOME_WORLD;
     }
+
+    /**
+     * Whether the action needs to be performed
+     *
+     * @return bool
+     */
+    public function requiresPerform(): bool
+    {
+        return true;
+    }
 }

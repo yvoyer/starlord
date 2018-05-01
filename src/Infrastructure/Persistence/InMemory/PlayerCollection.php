@@ -81,11 +81,13 @@ final class PlayerCollection implements WriteOnlyPlayers, \Countable
      */
     public function allPlayersOfGameHavePlayed(): bool
     {
-        return count(array_filter(
+        $players = array_filter(
             $this->players,
             function (ReadOnlyPlayer $player) {
                 return ! $player->turnIsDone();
             }
-        )) === 0;
+        );
+
+        return empty($players);
     }
 }

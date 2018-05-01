@@ -11,4 +11,11 @@ interface UserAction
      * @return string
      */
     public function actionName(): string;
+
+    /**
+     * Whether the action needs to be performed
+     *
+     * @return bool
+     */
+    public function requiresPerform(): bool;
 }

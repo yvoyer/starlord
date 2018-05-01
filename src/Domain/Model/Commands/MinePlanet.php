@@ -52,4 +52,14 @@ final class MinePlanet implements UserAction
     {
         return UserActionStore::MINE_PLANET;
     }
+
+    /**
+     * Whether the action needs to be performed
+     *
+     * @return bool
+     */
+    public function requiresPerform(): bool
+    {
+        return true;
+    }
 }

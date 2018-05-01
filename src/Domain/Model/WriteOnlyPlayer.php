@@ -44,9 +44,10 @@ interface WriteOnlyPlayer extends ReadOnlyPlayer
     public function hasCardInHand(int $cardId): bool;
 
     /**
+     * @param GameContext $context
      * @param string[] $requiredActions The required actions needed to finish the action.
      */
-    public function startAction(array $requiredActions = []);
+    public function startAction(GameContext $context, array $requiredActions = []);
 
     /**
      * @param UserAction $action
@@ -57,8 +58,6 @@ interface WriteOnlyPlayer extends ReadOnlyPlayer
      * @param Colons $colons
      */
     public function loadColons(Colons $colons);
-
-    public function startGame();
 
     public function startTurn();
 

@@ -2,8 +2,13 @@
 
 namespace StarLord\Domain\Model;
 
-interface EndOfGameResolver
+interface GameContext
 {
+    /**
+     * @return bool
+     */
+    public function gameIsStarted(): bool;
+
     /**
      * @return bool
      */
