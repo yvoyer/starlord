@@ -5,6 +5,7 @@ namespace StarLord\Domain\Model\Commands;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\HomeWorldWasSelected;
+use StarLord\Domain\Model\InProgressGame;
 use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\TestPlayer;
@@ -34,7 +35,7 @@ final class SelectHomeWorldHandlerTest extends TestCase
             new PlayerCollection([$this->player = TestPlayer::playingPlayer(1)]),
             $this->publisher = $this->createMock(Publisher::class)
         );
-        $this->player->startAction([UserActionStore::SELECT_HOME_WORLD]);
+        $this->player->startAction(new InProgressGame(), [UserActionStore::SELECT_HOME_WORLD]);
     }
 
     public function test_it_should_perform_the_action()

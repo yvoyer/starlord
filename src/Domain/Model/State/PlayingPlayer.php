@@ -11,6 +11,11 @@ final class PlayingPlayer extends PlayerStatus
         return true;
     }
 
+    public function startTurn(): PlayerStatus
+    {
+        return $this;
+    }
+
     public function endTurn(): PlayerStatus
     {
         return new DonePlayer();

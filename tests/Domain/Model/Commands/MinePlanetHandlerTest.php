@@ -9,6 +9,7 @@ use StarLord\Domain\Model\Colons;
 use StarLord\Domain\Model\ColoredPlanet;
 use StarLord\Domain\Model\Exception\InvalidPlanetOwnerException;
 use StarLord\Domain\Model\Galaxy;
+use StarLord\Domain\Model\InProgressGame;
 use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\TestPlayer;
@@ -57,7 +58,7 @@ final class MinePlanetHandlerTest extends TestCase
         $this->world = new Galaxy([]);
         $this->world->savePlanet($this->planetId = new PlanetId(10), $this->planet = ColoredPlanet::yellow());
         $this->player = TestPlayer::playingPlayer(1);
-        $this->player->startAction([UserActionStore::MINE_PLANET]);
+        $this->player->startAction(new InProgressGame(), [UserActionStore::MINE_PLANET]);
 
         $this->handler = new MinePlanetHandler(
             $this->players = new PlayerCollection([$this->player]),
@@ -82,7 +83,7 @@ final class MinePlanetHandlerTest extends TestCase
     public function test_it_not_allow_to_mine_a_planet_you_do_not_own()
     {
         $other = TestPlayer::playingPlayer(99);
-        $other->startAction([UserActionStore::MINE_PLANET]);
+        $other->startAction(new InProgressGame(), [UserActionStore::MINE_PLANET]);
         $this->players->savePlayer($other->getIdentity(), $other);
         $this->assertPlanetIsColonized();
         $this->expectException(InvalidPlanetOwnerException::class);

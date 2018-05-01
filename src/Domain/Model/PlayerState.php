@@ -103,15 +103,13 @@ final class PlayerState extends StateMetadata
      * | From / to |    setup        |   playing         |     selecting     |       done        |
      * |=========================================================================================|
      * | setup     | start-action    | start-turn        | N/A               | N/A               |
-     * |           | continue-action |                   |                   |                   |
-     * |           | end-action      |                   |                   |                   |
+     * |           | perform-action  |                   |                   |                   |
      * +-----------+-----------------+-------------------+-------------------+-------------------+
-     * | playing   |      N/A        | start-game        | start-action      | end-turn          |
+     * | playing   |      N/A        | start-turn        | start-action      | end-turn          |
      * +-----------+-----------------+-------------------+-------------------+-------------------+
-     * | selecting |      N/A        | end-action II     | continue-action I | N/A               |
+     * | selecting |      N/A        | perform-action II | perform-action I  | N/A               |
      * +-----------+-----------------+-------------------+-------------------+-------------------+
      * | done      |      N/A        | start-turn        | N/A               | N/A               |
-     * |           |                 | start-game        |                   |                   |
      * +-----------+-----------------+-------------------+-------------------+-------------------+
      *
      * Note:

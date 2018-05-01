@@ -104,18 +104,18 @@ final class PlayerStateTest extends TestCase
         $this->assertTrue($this->player->isActive());
         $this->assertFalse($this->player->turnIsDone());
     }
-
-    public function test_it_should_allow_to_play_action_when_in_setup()
-    {
-        $this->assertFalse($this->player->isActive());
-        $this->assertFalse($this->player->turnIsDone());
-
-        $this->player->startAction(new SettingUpGame(), ['action']);
-        $this->player->performAction(new StringAction('action'));
-
-        $this->assertTrue($this->player->isActive());
-        $this->assertFalse($this->player->turnIsDone());
-    }
+//
+//    public function test_it_should_allow_to_play_action_when_in_setup()
+//    {
+//        $this->assertFalse($this->player->isActive());
+//        $this->assertFalse($this->player->turnIsDone());
+//
+//        $this->player->startAction(new SettingUpGame(), ['action']);
+//        $this->player->performAction(new StringAction('action'));
+//
+//        $this->assertFalse($this->player->isActive());
+//        $this->assertFalse($this->player->turnIsDone());
+//    }
 //
 //    public function test_it_should_allow_to_start_game_when_all_actions_played()
 //    {
@@ -138,7 +138,7 @@ final class PlayerStateTest extends TestCase
 
         $this->player->startAction(new SettingUpGame(), ['action']);
 
-        $this->assertTrue($this->player->isActive());
+        $this->assertFalse($this->player->isActive());
         $this->assertFalse($this->player->turnIsDone());
     }
 
@@ -151,7 +151,7 @@ final class PlayerStateTest extends TestCase
         $this->player->performAction(new StringAction('action'));
         $this->assertTrue($this->player->actionsAreCompleted());
 
-        $this->assertTrue($this->player->isActive());
+        $this->assertFalse($this->player->isActive());
         $this->assertFalse($this->player->turnIsDone());
     }
 
@@ -162,6 +162,18 @@ final class PlayerStateTest extends TestCase
 
         $this->player->startAction(new SettingUpGame(), ['action1', 'action2']);
         $this->player->performAction(new StringAction('action1'));
+
+        $this->assertFalse($this->player->isActive());
+        $this->assertFalse($this->player->turnIsDone());
+    }
+
+    public function test_it_should_allow_to_start_turn_when_playing()
+    {
+        $this->player->startTurn();
+        $this->assertTrue($this->player->isActive());
+        $this->assertFalse($this->player->turnIsDone());
+
+        $this->player->startTurn();
 
         $this->assertTrue($this->player->isActive());
         $this->assertFalse($this->player->turnIsDone());

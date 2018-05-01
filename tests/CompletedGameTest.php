@@ -2,6 +2,7 @@
 
 namespace StarLord;
 
+use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use StarLord\Application\StarLordGame;
 use StarLord\Domain\Model\Commands\CreateGame;
@@ -11,6 +12,8 @@ use StarLord\Domain\Model\Commands\PlayCard;
 use StarLord\Domain\Model\Commands\SelectHomeWorld;
 use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\PlayerId;
+use StarLord\Domain\Model\ReadOnlyPlayer;
+use StarLord\Domain\Model\TestPlayer;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 
 final class CompletedGameTest extends TestCase
@@ -80,7 +83,7 @@ final class CompletedGameTest extends TestCase
     public function test_start_of_game()
     {
         $game = new StarLordGame(
-            $this->players = new PlayerCollection([])
+            $players = new PlayerCollection([])
         );
         $game->handle(new CreateGame([$this->playerOne, $this->playerTwo, $this->playerThree]));
 
@@ -93,19 +96,16 @@ final class CompletedGameTest extends TestCase
         $game->handle(new SelectHomeWorld($this->playerThree, $this->planetFive));
         $game->handle(new EndPlayerTurn($this->playerThree));
 
-        $this->assertThat(
-            $game->getPlayer($this->playerOne),
-            PlayerAssertion::create($this->playerOne)
-                ->hasPopulation(1)
-                ->hasCredit(10)
+        AssertThat::player($game->getPlayer($this->playerOne))
+            ->hasPopulation(1)
+            ->hasCredit(10)
+        ;
 //                ->hasDeuterium(5)
   //              ->hasCrystalCount(0)
     //            ->hasCruiserCount(0)
       //          ->hasTransportCount(1)
         //        ->hasFighterCount(2)
           //      ->hasCardsInHand([1010, 1011, 1012, 1013, 1014])
-                ->build()
-        );
 //        $this->assertPlayer($this->playerTwo, $game);
   //      $this->assertPlayer($this->playerThree, $game);
 
@@ -161,10 +161,9 @@ final class CompletedGameTest extends TestCase
 //        assertPlayer($playerTwo, $players);
 //        assertPlayer($playerThree, $players);
 //    }
-    private function assertPlayer(string $expected, PlayerId $id, StarLordGame $game) {
-        $player = $game->getPlayer($id);
+    private function assertPlayer(ReadOnlyPlayer $player, Constraint $constraint) {
         $data = [
-            'id' => $id->toInt(),
+            'id' => $player->getIdentity()->toInt(),
             'population' => $player->getPopulation()->toInt(),
             'hand' => $player->cards(),
             'credit' => $player->getCredit()->toInt(),
@@ -177,6 +176,6 @@ final class CompletedGameTest extends TestCase
             // todo add representation of the planets repartition (who has how many colonies)
         ];
 
-        $this->assertJsonStringEqualsJsonString($expected, json_encode($data));
+        $this->assertThat(json_encode($data), $constraint);
     }
 }

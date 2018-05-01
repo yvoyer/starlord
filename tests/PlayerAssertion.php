@@ -2,35 +2,19 @@
 
 namespace StarLord;
 
-use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Framework\Constraint\IsEqual;
-use PHPUnit\Framework\Constraint\IsIdentical;
-use PHPUnit\Framework\Constraint\LogicalAnd;
-use StarLord\Domain\Model\PlayerId;
-use StarLord\Domain\Model\TestPlayer;
+use PHPUnit\Framework\Assert;
+use StarLord\Domain\Model\ReadOnlyPlayer;
 
 final class PlayerAssertion
 {
     /**
-     * @var Constraint[]
+     * @var ReadOnlyPlayer
      */
-    private $constraints = [];
+    private $player;
 
-    private function __construct(PlayerId $playerId)
+    public function __construct(ReadOnlyPlayer $player)
     {
-        $this->constraints[] = new IsEqual($playerId);
-    }
-
-    /**
-     * @return Constraint
-     */
-    public function build(): Constraint
-    {
-        $constraint = new LogicalAnd();
-        $constraint->setConstraints($this->constraints);
-
-        return $constraint;
+        $this->player = $player;
     }
 
     /**
@@ -38,12 +22,12 @@ final class PlayerAssertion
      *
      * @return PlayerAssertion
      */
-    public function hasPopulation(int $expected): self
+    public function hasPopulation(int $expected): PlayerAssertion
     {
-        $this->constraints[] = new Callback(
-            function (TestPlayer $player) use ($expected) {
-                return $player->getPopulation()->toInt() === $expected;
-            }
+        Assert::assertSame(
+            $expected,
+            $this->player->getPopulation()->toInt(),
+            sprintf('Population of player "%s" is not as expected.', $this->player->getIdentity()->toInt())
         );
 
         return $this;
@@ -54,24 +38,14 @@ final class PlayerAssertion
      *
      * @return PlayerAssertion
      */
-    public function hasCredit(int $expected): self
+    public function hasCredit(int $expected): PlayerAssertion
     {
-        $this->constraints[] = new Callback(
-            function (TestPlayer $player) use ($expected) {
-                return $player->getCredit()->toInt() === $expected;
-            }
+        Assert::assertSame(
+            $expected,
+            $this->player->getCredit()->toInt(),
+            sprintf('Credit of player "%s" is not as expected.', $this->player->getIdentity()->toInt())
         );
 
         return $this;
-    }
-
-    /**
-     * @param PlayerId $playerId
-     *
-     * @return PlayerAssertion
-     */
-    public static function create(PlayerId $playerId): self
-    {
-        return new self($playerId);
     }
 }

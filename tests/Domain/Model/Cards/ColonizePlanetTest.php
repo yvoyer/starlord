@@ -2,11 +2,10 @@
 
 namespace StarLord\Domain\Model\Cards;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Model\Credit;
+use StarLord\Domain\Model\TestPlayer;
 use StarLord\Domain\Model\UserActionStore;
-use StarLord\Domain\Model\WriteOnlyPlayer;
 
 final class ColonizePlanetTest extends TestCase
 {
@@ -16,33 +15,33 @@ final class ColonizePlanetTest extends TestCase
     private $card;
 
     /**
-     * @var WriteOnlyPlayer|MockObject
+     * @var TestPlayer
      */
     private $player;
 
     public function setUp()
     {
-        $this->player = $this->createMock(WriteOnlyPlayer::class);
+        $this->player = TestPlayer::playingPlayer(1);
+        $this->player->addCredit(new Credit(10));
         $this->card = new ColonizePlanet(new Credit(2));
     }
 
     public function test_it_initialize_colonization()
     {
-        $this->player
-            ->expects($this->once())
-            ->method('startAction')
-            ->with([UserActionStore::MOVE_SHIP]);
+        $this->assertEmpty($this->player->actionsToPerform());
 
         $this->card->whenPlayedBy($this->player);
+
+        $this->assertCount(1, $this->player->actionsToPerform());
+        $this->assertEquals([UserActionStore::MOVE_SHIP], $this->player->actionsToPerform());
     }
 
     public function test_it_should_cost_credit_to_colonize()
     {
-        $this->player
-            ->expects($this->once())
-            ->method('pay')
-            ->with(new Credit(2));
+        $this->assertSame(10, $this->player->getCredit()->toInt());
 
         $this->card->whenPlayedBy($this->player);
+
+        $this->assertSame(8, $this->player->getCredit()->toInt());
     }
 }

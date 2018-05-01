@@ -5,6 +5,7 @@ namespace StarLord\Domain\Model\Commands;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\PlayerTurnHasEnded;
+use StarLord\Domain\Model\InProgressGame;
 use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\TestPlayer;
@@ -54,7 +55,7 @@ final class EndPlayerTurnHandlerTest extends TestCase
      */
     public function test_it_should_not_allow_to_end_turn_when_waiting_for_playing_action()
     {
-        $this->player->startAction(['action']);
+        $this->player->startAction(new InProgressGame(), ['action']);
         $this->assertTrue($this->player->isActive());
         $this->assertCount(1, $this->player->actionsToPerform());
         $this->handler->__invoke(new EndPlayerTurn(new PlayerId(1)));
@@ -66,7 +67,7 @@ final class EndPlayerTurnHandlerTest extends TestCase
      */
     public function test_it_should_not_allow_to_end_turn_when_turn_already_ended()
     {
-        $this->player->startAction(['action']);
+        $this->player->startAction(new InProgressGame(), ['action']);
         $this->player->performAction(new StringAction('action'));
         $this->player->endTurn();
         $this->assertTrue($this->player->turnIsDone());
@@ -74,9 +75,8 @@ final class EndPlayerTurnHandlerTest extends TestCase
         $this->handler->__invoke(new EndPlayerTurn(new PlayerId(1)));
     }
 
-    public function test_it_should_publish_even_when_ending_player_turn()
+    public function test_it_should_publish_event_when_ending_player_turn()
     {
-        $this->player->startAction();
         $this->publisher
             ->expects($this->once())
             ->method('publish')

@@ -6,6 +6,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StarLord\Domain\Events\ShipWasMoved;
 use StarLord\Domain\Model\Galaxy;
+use StarLord\Domain\Model\InProgressGame;
 use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\Publisher;
 use StarLord\Domain\Model\ShipId;
@@ -49,7 +50,7 @@ final class MoveShipHandlerTest extends TestCase
     public function setUp()
     {
         $this->player = TestPlayer::playingPlayer(1);
-        $this->player->startAction();
+        $this->player->startAction(new InProgressGame());
 
         $this->handler = new MoveShipHandler(
             $this->players = new PlayerCollection([$this->player]),

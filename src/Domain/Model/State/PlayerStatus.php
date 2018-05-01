@@ -34,7 +34,7 @@ abstract class PlayerStatus
     public function performAction(ReadOnlyPlayer $player): PlayerStatus
     {
         throw InvalidStateTransitionException::notAllowedTransition(
-            'start-action', 'player', $this->toString()
+            'perform-action', 'player', $this->toString()
         );
     }
 

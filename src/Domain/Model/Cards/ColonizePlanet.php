@@ -4,6 +4,7 @@ namespace StarLord\Domain\Model\Cards;
 
 use StarLord\Domain\Model\Card;
 use StarLord\Domain\Model\Credit;
+use StarLord\Domain\Model\InProgressGame;
 use StarLord\Domain\Model\UserActionStore;
 use StarLord\Domain\Model\WriteOnlyPlayer;
 
@@ -28,7 +29,7 @@ final class ColonizePlanet implements Card
     public function whenPlayedBy(WriteOnlyPlayer $player)
     {
         $player->pay($this->cost);
-        $player->startAction([UserActionStore::MOVE_SHIP]);
+        $player->startAction(new InProgressGame(), [UserActionStore::MOVE_SHIP]);
     }
 
     /**

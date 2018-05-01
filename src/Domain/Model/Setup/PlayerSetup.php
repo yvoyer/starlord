@@ -5,6 +5,7 @@ namespace StarLord\Domain\Model\Setup;
 use StarLord\Domain\Events\GameWasCreated;
 use StarLord\Domain\Events\PlayerJoinedGame;
 use StarLord\Domain\Model\Publisher;
+use StarLord\Domain\Model\SettingUpGame;
 use StarLord\Domain\Model\TestPlayer;
 use StarLord\Domain\Model\UserActionStore;
 use StarLord\Domain\Model\WriteOnlyPlayers;
@@ -41,7 +42,7 @@ final class PlayerSetup
                 throw new \InvalidArgumentException("Player with id '{$playerId->toString()}' already exists.");
             }
             $player = TestPlayer::playingPlayer($playerId->toInt());
-            $player->startAction([UserActionStore::SELECT_HOME_WORLD]);
+            $player->startAction(new SettingUpGame(), [UserActionStore::SELECT_HOME_WORLD]);
             $this->players->savePlayer($playerId, $player);
 
             $this->publisher->publish(new PlayerJoinedGame($playerId));

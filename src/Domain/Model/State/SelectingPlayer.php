@@ -2,7 +2,7 @@
 
 namespace StarLord\Domain\Model\State;
 
-use StarLord\Domain\Model\GameContext;
+use StarLord\Domain\Model\ReadOnlyPlayer;
 
 final class SelectingPlayer extends PlayerStatus
 {
@@ -11,12 +11,9 @@ final class SelectingPlayer extends PlayerStatus
         return true;
     }
 
-    public function startAction(GameContext $context): PlayerStatus
+    public function performAction(ReadOnlyPlayer $player): PlayerStatus
     {
-        if () {
-
-        }
-        return new parent::startAction($context);
+        return new PlayingPlayer();
     }
 
     protected function toString(): string
