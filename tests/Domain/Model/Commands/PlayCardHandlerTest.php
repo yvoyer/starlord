@@ -80,4 +80,14 @@ final class PlayCardHandlerTest extends TestCase
         $this->expectExceptionMessage('The card "34" cannot be played since it is not in player "1" hand.');
         $this->handler->__invoke(new PlayCard($this->player->getIdentity(), $cardId));
     }
+
+    public function test_it_should_remove_the_card_from_hand()
+    {
+        $this->player->drawCard(34, $this->card);
+        $this->assertCount(1, $this->player->cards());
+
+        $this->handler->__invoke(new PlayCard($this->player->getIdentity(), 34));
+
+        $this->assertCount(0, $this->player->cards());
+    }
 }

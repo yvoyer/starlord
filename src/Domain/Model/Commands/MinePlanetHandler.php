@@ -43,10 +43,10 @@ final class MinePlanetHandler
     {
         $playerId = $command->playerId();
         $planetId = $command->planetId();
-        $player = $this->players->getPlayerWithId($playerId);
-        $player->performAction($command);
         $planet = $this->world->planetWithId($planetId);
         $planet->mine($playerId);
+        $player = $this->players->getPlayerWithId($playerId);
+        $player->performAction($command);
 
         $this->world->savePlanet($planetId, $planet);
         $this->publisher->publish(new PlanetWasMined($playerId, $planetId));

@@ -51,7 +51,7 @@ final class EndPlayerTurnHandlerTest extends TestCase
 
     /**
      * @expectedException        \StarLord\Domain\Model\Exception\NotCompletedActionException
-     * @expectedExceptionMessage Cannot end turn when remaining actions are required ["action"].
+     * @expectedExceptionMessage Player "1" cannot end turn when remaining actions are required ["action"].
      */
     public function test_it_should_not_allow_to_end_turn_when_waiting_for_playing_action()
     {

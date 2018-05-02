@@ -186,7 +186,8 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         if (false === $key && $action->requiresPerform()) {
             throw new PlayerActionException(
                 sprintf(
-                    'Cannot perform the action "%s" when it is not required.',
+                    'Player "%s" cannot perform the action "%s" when it is not required.',
+                    $this->getIdentity()->toString(),
                     $action->actionName()
                 )
             );
@@ -207,7 +208,8 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
         if (! $this->actionsAreCompleted()) {
             throw new NotCompletedActionException(
                 sprintf(
-                    'Cannot end turn when remaining actions are required %s.',
+                    'Player "%s" cannot end turn when remaining actions are required %s.',
+                    $this->getIdentity()->toString(),
                     json_encode($this->remainingActions)
                 )
             );

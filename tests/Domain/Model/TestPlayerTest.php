@@ -221,7 +221,7 @@ final class TestPlayerTest extends TestCase
     {
         $this->player->startAction(new InProgressGame(), ['action']);
         $this->expectException(NotCompletedActionException::class);
-        $this->expectExceptionMessage('Cannot end turn when remaining actions are required ["action"].');
+        $this->expectExceptionMessage('Player "99" cannot end turn when remaining actions are required ["action"].');
         $this->player->endTurn();
     }
 
@@ -240,20 +240,7 @@ final class TestPlayerTest extends TestCase
         $this->player->startAction(new InProgressGame(), []);
 
         $this->expectException(PlayerActionException::class);
-        $this->expectExceptionMessage('Cannot perform the action "action" when it is not required.');
+        $this->expectExceptionMessage('Player "99" cannot perform the action "action" when it is not required.');
         $this->player->performAction(new StringAction('action'));
     }
-//
-//    public function test_it_should_not_allow_to_start_game_when_remaining_actions()
-//    {
-//        $this->assertFalse($this->player->isActive());
-//        $this->assertFalse($this->player->turnIsDone());
-//        $this->player->startAction(new InProgressGame(), ['action']);
-//
-//        $this->expectException(NotCompletedActionException::class);
-//        $this->expectExceptionMessage(
-//            'Game cannot be started when player have some not completed actions "["action"]".'
-//        );
-//        $this->player->startGame();
-//    }
 }

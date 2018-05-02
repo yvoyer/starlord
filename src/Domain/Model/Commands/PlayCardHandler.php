@@ -43,14 +43,16 @@ final class PlayCardHandler
     public function __invoke(PlayCard $command)
     {
         $player = $this->players->getPlayerWithId($command->playerId());
-        if (! $player->hasCardInHand($command->cardId())) {
+        $cardId = $command->cardId();
+        if (! $player->hasCardInHand($cardId)) {
             throw new InvalidCardException('The card "34" cannot be played since it is not in player "1" hand.');
         }
 
-        $card = $this->cards->getCardWithId($command->cardId());
+        $player->playCard($cardId);
+        $card = $this->cards->getCardWithId($cardId);
         $card->whenPlayedBy($player);
 
         $this->players->savePlayer($command->playerId(), $player);
-        $this->publisher->publish(new CardWasPlayed($command->cardId(), $command->playerId()));
+        $this->publisher->publish(new CardWasPlayed($cardId, $command->playerId()));
     }
 }
