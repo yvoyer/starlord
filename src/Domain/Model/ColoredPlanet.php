@@ -93,6 +93,16 @@ final class ColoredPlanet implements WriteOnlyPlanet
     }
 
     /**
+     * @param PlayerId $playerId
+     *
+     * @return bool
+     */
+    public function isColonizedBy(PlayerId $playerId): bool
+    {
+        return $this->isColonized() && $playerId->match($this->owner);
+    }
+
+    /**
      * @param PlayerId $owner
      * @param Colons $colons
      */

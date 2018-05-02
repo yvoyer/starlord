@@ -7,11 +7,11 @@ use Star\Component\Identity\Exception\EntityNotFoundException;
 interface World
 {
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      *
      * @return WriteOnlyPlanet[]
      */
-    public function allColonizedPlanetsOfPlayer(int $playerId): array;
+    public function allColonizedPlanetsOfPlayer(PlayerId $playerId): array;
 
     /**
      * @return WriteOnlyPlanet[]

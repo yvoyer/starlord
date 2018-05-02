@@ -35,14 +35,14 @@ final class Galaxy implements World
     }
 
     /**
-     * @param int $playerId
+     * @param PlayerId $playerId
      *
      * @return WriteOnlyPlanet[]
      */
-    public function allColonizedPlanetsOfPlayer(int $playerId): array
+    public function allColonizedPlanetsOfPlayer(PlayerId $playerId): array
     {
-        return array_filter($this->planets, function (WriteOnlyPlanet $planet) {
-            return $planet->isColonized();
+        return array_filter($this->planets, function (WriteOnlyPlanet $planet) use ($playerId) {
+            return $planet->isColonizedBy($playerId);
         });
     }
 

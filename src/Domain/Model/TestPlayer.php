@@ -145,7 +145,6 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
     public function playCard(int $cardId): Card
     {
         $card = $this->getCardFromHand($cardId);
-//        $card->play($this->id, $this);
 
         $this->battlefield[$cardId] = $card;
         unset($this->hand[$cardId]);
@@ -195,26 +194,8 @@ class TestPlayer implements ReadOnlyPlayer, WriteOnlyPlayer
 
         unset($this->remainingActions[$key]);
 
-//        if ($this->actionsAreCompleted()) {
-            $this->state = $this->state->performAction($this);
-  //      } else {
-    //        $this->state = $this->state->continueAction();
-      //  }
+        $this->state = $this->state->performAction($this);
     }
-//
-//    public function startGame()
-//    {
-//        if (! $this->actionsAreCompleted()) {
-//            throw new NotCompletedActionException(
-//                sprintf(
-//                    'Game cannot be started when player have some not completed actions "%s".',
-//                    json_encode($this->remainingActions)
-//                )
-//            );
-//        }
-//
-//        $this->state = $this->state->startGame();
-//    }
 
     public function startTurn()
     {

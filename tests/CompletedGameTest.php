@@ -13,7 +13,6 @@ use StarLord\Domain\Model\Commands\SelectHomeWorld;
 use StarLord\Domain\Model\PlanetId;
 use StarLord\Domain\Model\PlayerId;
 use StarLord\Domain\Model\ReadOnlyPlayer;
-use StarLord\Domain\Model\TestPlayer;
 use StarLord\Infrastructure\Persistence\InMemory\PlayerCollection;
 
 final class CompletedGameTest extends TestCase
@@ -77,7 +76,6 @@ final class CompletedGameTest extends TestCase
         $this->planetThree = new PlanetId(502);
         $this->planetFour = new PlanetId(503);
         $this->planetFive = new PlanetId(504);
-
     }
 
     public function test_start_of_game()
@@ -88,41 +86,118 @@ final class CompletedGameTest extends TestCase
         $game->handle(new CreateGame([$this->playerOne, $this->playerTwo, $this->playerThree]));
 
         $game->handle(new SelectHomeWorld($this->playerOne, $this->planetOne));
+        AssertThat::player($game->getPlayer($this->playerOne))
+            ->hasPopulation(0)
+            ->hasCredit(10)
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1010, 1011, 1012, 1013, 1014]);
         $game->handle(new EndPlayerTurn($this->playerOne));
 
         $game->handle(new SelectHomeWorld($this->playerTwo, $this->planetTwo));
+        AssertThat::player($game->getPlayer($this->playerTwo))
+            ->hasPopulation(0)
+            ->hasCredit(10)
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1005, 1006, 1007, 1008, 1009]);
         $game->handle(new EndPlayerTurn($this->playerTwo));
 
         $game->handle(new SelectHomeWorld($this->playerThree, $this->planetFive));
+        AssertThat::player($game->getPlayer($this->playerThree))
+            ->hasPopulation(0)
+            ->hasCredit(10)
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1000, 1001, 1002, 1003, 1004]);
         $game->handle(new EndPlayerTurn($this->playerThree));
 
+        return $game;
+    }
+
+    /**
+     * @param StarLordGame $game
+     *
+     * @depends test_start_of_game
+     */
+    public function test_start_of_first_turn(StarLordGame $game)
+    {
         AssertThat::player($game->getPlayer($this->playerOne))
+            ->hasPopulation(0)
+            ->hasCredit(10)
+            ->hasDeuterium(6)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1010, 1011, 1012, 1013, 1014]);
+        AssertThat::player($game->getPlayer($this->playerTwo))
             ->hasPopulation(1)
             ->hasCredit(10)
-        ;
-//                ->hasDeuterium(5)
-  //              ->hasCrystalCount(0)
-    //            ->hasCruiserCount(0)
-      //          ->hasTransportCount(1)
-        //        ->hasFighterCount(2)
-          //      ->hasCardsInHand([1010, 1011, 1012, 1013, 1014])
-//        $this->assertPlayer($this->playerTwo, $game);
-  //      $this->assertPlayer($this->playerThree, $game);
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1005, 1006, 1007, 1008, 1009]);
+        AssertThat::player($game->getPlayer($this->playerThree))
+            ->hasPopulation(0)
+            ->hasCredit(11)
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1000, 1001, 1002, 1003, 1004]);
 
         $game->handle(new PlayCard($this->playerOne, 1010)); // Buy 2 transport for 1 CRD
+        AssertThat::player($game->getPlayer($this->playerOne))
+            ->hasPopulation(0)
+            ->hasCredit(8)
+            ->hasDeuterium(6)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(4)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1011, 1012, 1013, 1014, 1015]);
+
         $game->handle(new PlayCard($this->playerTwo, 1005)); // Buy Colonists for 2CRD todo produced on start of turn maybe??
+        AssertThat::player($game->getPlayer($this->playerTwo))
+            ->hasPopulation(2)
+            ->hasCredit(8)
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1006, 1007, 1008, 1009, 1010]);
+
         $game->handle(new PlayCard($this->playerThree, 1000)); // Mine Yellow Crystal (on starting planet) for 5 CRD
         $game->handle(new MinePlanet($this->playerThree, $this->planetFive));
+        AssertThat::player($game->getPlayer($this->playerThree))
+            ->hasPopulation(0)
+            ->hasCredit(11)
+            ->hasDeuterium(5)
+            ->hasCrystalCount(0)
+            ->hasTransportCount(2)
+            ->hasFighterCount(1)
+            ->hasCruiserCount(0)
+            ->hasCardsInHand([1000, 1001, 1002, 1003, 1004]);
 
-//    $endPlayerTurnHandler(new EndPlayerTurn($playerOne));
-        //  $endPlayerTurnHandler(new EndPlayerTurn($playerTwo));
-        //$endPlayerTurnHandler(new EndPlayerTurn($playerThree));
+        $game->handle(new EndPlayerTurn($this->playerOne));
+        $game->handle(new EndPlayerTurn($this->playerTwo));
+        $game->handle(new EndPlayerTurn($this->playerThree));
 
-        $this->assertPlayer($this->playerOne, $game);
-        $this->assertPlayer($this->playerTwo, $game);
-        $this->assertPlayer($this->playerThree, $game);
-
-        $this->fail('ICI');
+        return $game;
     }
 
 //{ echo "Turn 2\n";

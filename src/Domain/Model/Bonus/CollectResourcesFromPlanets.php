@@ -32,13 +32,14 @@ final class CollectResourcesFromPlanets
     public function onTurnWasStarted(TurnWasStarted $event)
     {
         $players = $this->players->playersOfGame();
-        foreach ($players as $playerId => $player) {
+        foreach ($players as $player) {
             // produce resources from planets
+            $playerId = $player->getIdentity();
             foreach ($this->world->allColonizedPlanetsOfPlayer($playerId) as $planet) {
                 $player->collectResourcesFromPlanet($planet);
             }
 
-            $this->players->savePlayer(new PlayerId($playerId), $player);
+            $this->players->savePlayer($playerId, $player);
         }
     }
 }

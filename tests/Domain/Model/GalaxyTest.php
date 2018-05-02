@@ -11,8 +11,9 @@ final class GalaxyTest extends TestCase
         $galaxy = Galaxy::withPlanetCount(3);
         $this->assertCount(3, $planets = $galaxy->allPlanets());
 
-        $planets[0]->colonize(new PlayerId(1), new Colons(0));
-        $this->assertCount(1, $galaxy->allColonizedPlanetsOfPlayer(1));
+        $planets[0]->colonize($playerOne = new PlayerId(1), new Colons(0));
+        $this->assertCount(1, $galaxy->allColonizedPlanetsOfPlayer($playerOne));
+        $this->assertCount(0, $galaxy->allColonizedPlanetsOfPlayer(new PlayerId(2)));
     }
 
     public function test_it_should_return_the_planet_by_id()

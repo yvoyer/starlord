@@ -71,9 +71,22 @@ final class StarLordGame
 
             public function __construct()
             {
+                $this->disableDebug();
+            }
+
+            public function enableDebug()
+            {
                 $this->logger = new class () {
                     public function log(string $message) {
                         echo($message);
+                    }
+                };
+            }
+
+            public function disableDebug()
+            {
+                $this->logger = new class () {
+                    public function log(string $message) {
                     }
                 };
             }
@@ -90,14 +103,13 @@ final class StarLordGame
                 $method = 'on' . ucfirst(substr($class, strrpos($class, '\\') + 1));
 
                 foreach ($this->subscribers as $subscriber) {
+                    $subscriberClass = substr(get_class($subscriber), strrpos(get_class($subscriber), '\\') + 1);
                     if (method_exists($subscriber, $method)) {
                         $data = $event->serialize();
-                        $subscriberClass = substr(get_class($subscriber), strrpos(get_class($subscriber), '\\') + 1);
-                        $this->logger->log("Publish event: '{$data}' for '{$subscriberClass}'.\n");
+                        $this->logger->log("Publish event: '{$data}' to '{$subscriberClass}'.\n");
                         $subscriber->{$method}($event);
-//            } else {
-//                $listener = get_class($subscriber);
-//                $this->logger->log("Skip listener '{$listener}' for event: '{$class}'. \n");
+                    } else {
+                        $this->logger->log("Skipped: {$subscriberClass}. \n");
                     }
                 }
             }
@@ -109,15 +121,8 @@ final class StarLordGame
             }
         };
 
-
-
-
-
-
-
-// Cards
+        // Cards
         $builder = new DeckBuilder();
-
         $builder->addPendingCard(1039);
         $builder->addPendingCard(1038);
         $builder->addPendingCard(1037);
@@ -144,28 +149,28 @@ final class StarLordGame
         $builder->addPendingCard(1016);
         $builder->addPendingCard(1015);
 
-// Cards in player 3 hands
+        // Cards in player 3 hands
         $builder->addPendingCard(1004);
         $builder->addPendingCard(1003);
         $builder->addPendingCard(1002);
         $builder->minePlanet(1001, 1); // turn 2
         $builder->minePlanet(1000, 1); // turn 1
 
-// Cards in player 2 hands
+        // Cards in player 2 hands
         $builder->addPendingCard(1009);
         $builder->addPendingCard(1008);
         $builder->addPendingCard(1007);
         $builder->minePlanet(1006, 1); // turn 2
         $builder->buildColonists(1005); // turn 1
 
-// Cards in player 1 hands
+        // Cards in player 1 hands
         $builder->addPendingCard(1014);
         $builder->addPendingCard(1013);
         $builder->colonizePlanet(1012); // turn 3
         $builder->minePlanet(1011, 1); // turn 2
         $builder->buyTransport(1010, 2); // turn 1
 
-// Other
+        // Other
         $this->world = new Galaxy([]);
         $this->world->savePlanet($homeWorld_playerOne_blue = new PlanetId(500), ColoredPlanet::blue());
         $this->world->savePlanet($homeWorld_playerTwo_green = new PlanetId(501), ColoredPlanet::green());
@@ -178,20 +183,11 @@ final class StarLordGame
                 new TestShip($playerOne_transport1 = new ShipId(400), $homeWorld_playerOne_blue, 3),
             ]
         );
-   //     $this->players = new \StarLord\Infrastructure\Persistence\InMemory\PlayerCollection();
 
         $deck = $builder->createDeck();
         $this->cardRegistry = $builder->createRegistry();
-//    [
-//        $a_moveShip = new \StarLord\Domain\Model\Actions\MoveShipAction(),
-//        $a_loadColons = new \StarLord\Domain\Model\Actions\MoveShipToPlanet(),
-//        $a_unloadColons = new \StarLord\Domain\Model\Actions\MoveShipToPlanet(),
-//    ]
 
-// Handlers
-// todo $performActionHandler = new \StarLord\Domain\Model\Commands\PerformActionHandlerTest($players, $actions, $publisher);
-
-// Listeners
+        // Listeners
         {
             $publisher->addSubscriber(
                 $createGameHandler = new CreateGameHandler($publisher)
@@ -254,7 +250,6 @@ final class StarLordGame
             );
         }
 
-
         $this->publisher = $publisher;
     }
 
@@ -294,5 +289,15 @@ final class StarLordGame
     public function getPlayer(PlayerId $id): ReadOnlyPlayer
     {
         return $this->players->getPlayerWithId($id);
+    }
+
+    public function enableDebug()
+    {
+        $this->publisher->enableDebug();
+    }
+
+    public function disableDebug()
+    {
+        $this->publisher->enableDebug();
     }
 }

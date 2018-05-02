@@ -24,6 +24,13 @@ interface WriteOnlyPlanet extends Card, ReadOnlyPlanet
     public function isColonized(): bool;
 
     /**
+     * @param PlayerId $playerId
+     *
+     * @return bool
+     */
+    public function isColonizedBy(PlayerId $playerId): bool;
+
+    /**
      * @param WriteOnlyPlayer $player
      */
     public function collectResources(WriteOnlyPlayer $player);
